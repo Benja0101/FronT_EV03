@@ -1,0 +1,28 @@
+<div class="container">
+  <div class="header">
+    <h2>Gestión de Productos</h2>
+    <button class="btn-primary" (click)="irACrear()">+ Nuevo Producto</button>
+  </div>
+
+  <div *ngIf="loading" class="loading">Cargando...</div>
+
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+
+  <div class="productos-grid" *ngIf="!loading && productos.length > 0">
+    <div class="producto-card" *ngFor="let producto of productos">
+      <h3>{{ producto.nombre }}</h3>
+      <div class="producto-info">
+        <p><strong>Código:</strong> {{ producto.codigo }}</p>
+        <p><strong>Stock:</strong> {{ producto.stock }} unidades</p>
+        <p class="precio">{{ producto.precio | number:'1.0-0' }}</p>
+      </div>
+      <div class="producto-actions">
+        <button class="btn-delete" (click)="eliminar(producto.codigo)">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <p *ngIf="!loading && productos.length === 0" class="empty-message">
+    No hay productos registrados. Crea uno nuevo para comenzar.
+  </p>
+</div>

@@ -1,0 +1,95 @@
+.container {
+  padding: 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+h2 {
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #555;
+  font-weight: 500;
+}
+
+input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+input:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+input:focus:not(:disabled) {
+  outline: none;
+  border-color: #667eea;
+}
+
+.error-message {
+  padding: 1rem;
+  background: #fee;
+  color: #c33;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+}
+
+.success-message {
+  padding: 1rem;
+  background: #efe;
+  color: #3c3;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn-primary, .btn-secondary {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: #667eea;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #5568d3;
+}
+
+.btn-secondary {
+  background: #ddd;
+  color: #333;
+}
+
+.btn-secondary:hover {
+  background: #ccc;
+}

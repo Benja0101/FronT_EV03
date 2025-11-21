@@ -1,0 +1,32 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2>Iniciar Sesión</h2>
+    <form (ngSubmit)="login()">
+      <div class="form-group">
+        <label>Usuario</label>
+        <input 
+          [(ngModel)]="username" 
+          name="username"
+          type="text" 
+          placeholder="Ingrese su usuario"
+          required>
+      </div>
+      
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input 
+          [(ngModel)]="password" 
+          name="password"
+          type="password" 
+          placeholder="Ingrese su contraseña"
+          required>
+      </div>
+
+      <button type="submit" class="btn-primary" [disabled]="!username || !password">
+        Iniciar Sesión
+      </button>
+
+      <p *ngIf="error" class="error-message">{{ error }}</p>
+    </form>
+  </div>
+</div>

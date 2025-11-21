@@ -1,0 +1,40 @@
+<div class="container">
+  <div class="header">
+    <h2>Gestión de Clientes</h2>
+    <button class="btn-primary" (click)="irACrear()">+ Nuevo Cliente</button>
+  </div>
+
+  <div *ngIf="loading" class="loading">Cargando...</div>
+
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+
+  <table *ngIf="!loading && clientes.length > 0">
+    <thead>
+      <tr>
+        <th>RUT</th>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>Email</th>
+        <th>Comuna</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let cliente of clientes">
+        <td>{{ cliente.rut }}</td>
+        <td>{{ cliente.nombre }}</td>
+        <td>{{ cliente.apellido }}</td>
+        <td>{{ cliente.email || 'N/A' }}</td>
+        <td>{{ cliente.comuna }}</td>
+        <td>
+          <button class="btn-edit" (click)="editar(cliente.rut)">Editar</button>
+          <button class="btn-delete" (click)="eliminar(cliente.rut)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!loading && clientes.length === 0" class="empty-message">
+    No hay clientes registrados. Crea uno nuevo para comenzar.
+  </p>
+</div>

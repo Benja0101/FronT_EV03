@@ -1,0 +1,79 @@
+<div class="container">
+  <h2>Registro de Ventas</h2>
+
+  <div class="ventas-section">
+    <h3>Nueva Venta</h3>
+    
+    <form (ngSubmit)="crearVenta()">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Número de Venta *</label>
+          <input 
+            [(ngModel)]="venta.numero" 
+            name="numero"
+            type="text" 
+            placeholder="Ej: V-001"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label>Cliente *</label>
+          <select 
+            [(ngModel)]="venta.rut_cliente" 
+            name="rut_cliente"
+            required>
+            <option value="">Seleccione un cliente</option>
+            <option *ngFor="let cliente of clientes" [value]="cliente.rut">
+              {{ cliente.nombre }} {{ cliente.apellido }} ({{ cliente.rut }})
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Total</label>
+          <input 
+            [(ngModel)]="venta.total" 
+            name="total"
+            type="number" 
+            placeholder="0"
+            step="0.01"
+            required>
+        </div>
+      </div>
+
+      <div *ngIf="error" class="error-message">{{ error }}</div>
+      <div *ngIf="success" class="success-message">{{ success }}</div>
+
+      <button type="submit" class="btn-primary">Registrar Venta</button>
+    </form>
+  </div>
+
+  <div class="ventas-lista">
+    <h3>Ventas Registradas</h3>
+    
+    <div *ngIf="loading" class="loading">Cargando...</div>
+
+    <table *ngIf="!loading && ventas.length > 0">
+      <thead>
+        <tr>
+          <th>Número</th>
+          <th>Fecha</th>
+          <th>Cliente</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let v of ventas">
+          <td>{{ v.numero }}</td>
+          <td>{{ v.fecha }}</td>
+          <td>{{ v.rut_cliente }}</td>
+          <td>{{ v.total | number:'1.0-2' }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p *ngIf="!loading && ventas.length === 0" class="empty-message">
+      No hay ventas registradas.
+    </p>
+  </div>
+</div>

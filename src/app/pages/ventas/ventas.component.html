@@ -1,79 +1,117 @@
-<div class="container">
-  <h2>Registro de Ventas</h2>
-
-  <div class="ventas-section">
-    <h3>Nueva Venta</h3>
-    
-    <form (ngSubmit)="crearVenta()">
-      <div class="form-row">
-        <div class="form-group">
-          <label>Número de Venta *</label>
-          <input 
-            [(ngModel)]="venta.numero" 
-            name="numero"
-            type="text" 
-            placeholder="Ej: V-001"
-            required>
-        </div>
-
-        <div class="form-group">
-          <label>Cliente *</label>
-          <select 
-            [(ngModel)]="venta.rut_cliente" 
-            name="rut_cliente"
-            required>
-            <option value="">Seleccione un cliente</option>
-            <option *ngFor="let cliente of clientes" [value]="cliente.rut">
-              {{ cliente.nombre }} {{ cliente.apellido }} ({{ cliente.rut }})
-            </option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Total</label>
-          <input 
-            [(ngModel)]="venta.total" 
-            name="total"
-            type="number" 
-            placeholder="0"
-            step="0.01"
-            required>
-        </div>
-      </div>
-
-      <div *ngIf="error" class="error-message">{{ error }}</div>
-      <div *ngIf="success" class="success-message">{{ success }}</div>
-
-      <button type="submit" class="btn-primary">Registrar Venta</button>
-    </form>
+<div class="ventas-container">
+  <!-- Animated background elements -->
+  <div class="bg-animation">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
   </div>
 
-  <div class="ventas-lista">
-    <h3>Ventas Registradas</h3>
-    
-    <div *ngIf="loading" class="loading">Cargando...</div>
+  <div class="content-wrapper">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-content">
+        <div class="title-section">
+          <div class="icon-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+          </div>
+          <div>
+            <h2>Registro de Ventas</h2>
+            <p class="subtitle">Administra y registra todas tus ventas</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <table *ngIf="!loading && ventas.length > 0">
-      <thead>
-        <tr>
-          <th>Número</th>
-          <th>Fecha</th>
-          <th>Cliente</th>
-          <th>Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let v of ventas">
-          <td>{{ v.numero }}</td>
-          <td>{{ v.fecha | date:'dd/MM/yyyy' }}</td>
-          <td>{{ obtenerNombreCliente(v.rut_cliente) }}</td>
-          <td>${{ v.total | number:'1.0-0' }}</td>
-        </tr>
-      </tbody>
-    </table>
 
-    <p *ngIf="!loading && ventas.length === 0" class="empty-message">
-      No hay ventas registradas.
-    </p>
+
+    <!-- Lista de Ventas -->
+    <div class="ventas-lista">
+      <div class="section-header">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <line x1="12" y1="9" x2="8" y2="9"></line>
+        </svg>
+        <h3>Ventas Registradas</h3>
+      </div>
+      
+      <div *ngIf="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Cargando ventas...</p>
+      </div>
+
+      <div *ngIf="!loading && ventas.length > 0" class="table-container">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>
+                <div class="th-content">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                  Número
+                </div>
+              </th>
+              <th>
+                <div class="th-content">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  Fecha
+                </div>
+              </th>
+              <th>
+                <div class="th-content">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                  Cliente
+                </div>
+              </th>
+              <th>
+                <div class="th-content">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                  </svg>
+                  Total
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let v of ventas; let i = index" [style.animation-delay]="(i * 0.05) + 's'">
+              <td><span class="badge">{{ v.numero }}</span></td>
+              <td><span class="date">{{ v.fecha | date:'dd/MM/yyyy' }}</span></td>
+              <td><strong>{{ obtenerNombreCliente(v.rut_cliente) }}</strong></td>
+              <td><span class="price">${{ v.total | number:'1.0-0' }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="!loading && ventas.length === 0" class="empty-state">
+        <div class="empty-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+        </div>
+        <h3>No hay ventas registradas</h3>
+        <p>Comienza registrando tu primera venta usando el formulario superior</p>
+      </div>
+    </div>
   </div>
 </div>

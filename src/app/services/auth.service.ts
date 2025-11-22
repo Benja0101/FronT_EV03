@@ -40,8 +40,16 @@ export class AuthService {
       .pipe(
         tap(response => {
           console.log('✅ Respuesta del servidor:', response);
+          console.log('🔑 Access Token recibido:', response.access?.substring(0, 20) + '...');
+          console.log('🔑 Refresh Token recibido:', response.refresh?.substring(0, 20) + '...');
+          
           localStorage.setItem('access_token', response.access);
           localStorage.setItem('refresh_token', response.refresh);
+          
+          console.log('💾 Token guardado en localStorage');
+          console.log('💾 Access Token guardado:', localStorage.getItem('access_token')?.substring(0, 20) + '...');
+          console.log('💾 Refresh Token guardado:', localStorage.getItem('refresh_token')?.substring(0, 20) + '...');
+          
           this.isAuthenticatedSubject.next(true);
         })
       );

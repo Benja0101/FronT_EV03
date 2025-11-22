@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { ProductoService, Producto } from '../services/producto.service';
+import { ProductoService, Producto } from '../../services/producto.service';
 
 @Component({
   selector: 'app-productos-lista',
@@ -16,26 +16,38 @@ export class ProductosListaComponent implements OnInit {
 
   constructor(
     private productoService: ProductoService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
+    console.log('🔵 ProductosListaComponent - ngOnInit ejecutado');
     this.cargarProductos();
   }
 
   cargarProductos() {
+    console.log('🔵 Iniciando carga de productos...');
     this.loading = true;
     this.error = '';
+    this.productos = []; // Limpiar productos anteriores
 
     this.productoService.getAllProductos().subscribe({
-      next: (data) => {
-        this.productos = Array.isArray(data) ? data : (data as any).results || [];
+      next: (response) => {
+        console.log('✅ Productos recibidos:', response);
+        this.productos = response.results || [];
+        console.log('📦 Productos procesados:', this.productos.length);
+        console.log('📦 Productos array:', this.productos);
         this.loading = false;
+        console.log('✅ Loading = false');
+        // Forzar detección de cambios
+        this.cdr.detectChanges();
+        console.log('🔄 Detección de cambios forzada');
       },
       error: (err) => {
-        console.error('Error al cargar productos', err);
+        console.error('❌ Error al cargar productos:', err);
         this.error = 'Error al cargar productos. Intente nuevamente.';
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }

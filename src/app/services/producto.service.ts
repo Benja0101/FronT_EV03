@@ -30,8 +30,9 @@ export class ProductoService {
     return this.http.get<PaginatedResponse<Producto>>(this.apiUrl, { params });
   }
 
-  getAllProductos(): Observable<Producto[]> {
-    return this.http.get<Producto[]>(this.apiUrl);
+  getAllProductos(): Observable<PaginatedResponse<Producto>> {
+    const params = new HttpParams().set('page_size', '1000');
+    return this.http.get<PaginatedResponse<Producto>>(this.apiUrl, { params });
   }
 
   getProducto(codigo: string): Observable<Producto> {

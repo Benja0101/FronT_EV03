@@ -3,10 +3,18 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
+export interface ClienteEnVenta {
+  rut: string;
+  nombre: string;
+  apellido: string;
+  email?: string;
+  comuna: string;
+}
+
 export interface Venta {
   numero: string;
   fecha: string;
-  rut_cliente: string;
+  rut_cliente: ClienteEnVenta | string; // Puede ser objeto anidado o solo el RUT
   total: number;
 }
 
@@ -28,8 +36,8 @@ export interface PaginatedResponse<T> {
   providedIn: 'root'
 })
 export class VentaService {
-  private apiUrl = `${environment.apiUrl}ventas/`;
-  private detalleUrl = `${environment.apiUrl}detalle-ventas/`;
+  private apiUrl = `${environment.apiUrl}venta/`;
+  private detalleUrl = `${environment.apiUrl}detalleVenta/`;
 
   constructor(private http: HttpClient) {}
 
@@ -39,8 +47,9 @@ export class VentaService {
     return this.http.get<PaginatedResponse<Venta>>(this.apiUrl, { params });
   }
 
-  getAllVentas(): Observable<Venta[]> {
-    return this.http.get<Venta[]>(this.apiUrl);
+  getAllVentas(): Observable<PaginatedResponse<Venta>> {
+    const params = new HttpParams().set('page_size', '1000');
+    return this.http.get<PaginatedResponse<Venta>>(this.apiUrl, { params });
   }
 
   getVenta(numero: string): Observable<Venta> {

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ClienteService, Cliente } from '../services/cliente.service';
+import { ClienteService, Cliente } from '../../services/cliente.service';
 
 @Component({
   selector: 'app-cliente-crear',

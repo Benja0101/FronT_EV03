@@ -1,0 +1,25 @@
+<nav class="navbar" *ngIf="isAuthenticated$ | async">
+  <div class="navbar-container">
+    <div class="navbar-brand">
+      <h1>Sistema de Ventas</h1>
+    </div>
+    
+    <ul class="navbar-menu">
+      <li>
+        <a (click)="navigateTo('/productos')" [class.active]="router.url === '/productos'" style="cursor: pointer;">Productos</a>
+      </li>
+      <li>
+        <a (click)="navigateTo('/clientes')" [class.active]="router.url === '/clientes'" style="cursor: pointer;">Clientes</a>
+      </li>
+      <li>
+        <a (click)="navigateTo('/ventas')" [class.active]="router.url === '/ventas'" style="cursor: pointer;">Ventas</a>
+      </li>
+    </ul>
+    
+    <div class="navbar-actions">
+      <button class="btn-logout" (click)="logout()">
+        <span>🚪</span> Cerrar Sesión
+      </button>
+    </div>
+  </div>
+</nav>

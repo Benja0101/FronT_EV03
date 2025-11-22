@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ClienteService, Cliente } from '../services/cliente.service';
+import { ClienteService, Cliente } from '../../services/cliente.service';
 
 @Component({
   selector: 'app-cliente-editar',

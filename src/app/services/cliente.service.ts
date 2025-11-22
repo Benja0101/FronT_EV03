@@ -22,7 +22,8 @@ export interface PaginatedResponse<T> {
   providedIn: 'root'
 })
 export class ClienteService {
-  private apiUrl = `${environment.apiUrl}clientes/`;
+  // Django no tiene /api/clientes/, solo /clientes/
+  private apiUrl = 'http://127.0.0.1:8000/clientes/api/clientes/';
 
   constructor(private http: HttpClient) {}
 
@@ -31,8 +32,9 @@ export class ClienteService {
     return this.http.get<PaginatedResponse<Cliente>>(this.apiUrl, { params });
   }
 
-  getAllClientes(): Observable<Cliente[]> {
-    return this.http.get<Cliente[]>(this.apiUrl);
+  getAllClientes(): Observable<PaginatedResponse<Cliente>> {
+    const params = new HttpParams().set('page_size', '1000');
+    return this.http.get<PaginatedResponse<Cliente>>(this.apiUrl, { params });
   }
 
   getCliente(rut: string): Observable<Cliente> {

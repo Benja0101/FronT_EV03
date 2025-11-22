@@ -1,0 +1,14 @@
+/* Estilos globales de la aplicación */
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* Contenedor principal para el contenido después del navbar */
+router-outlet + * {
+  display: block;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}

@@ -65,9 +65,9 @@
       <tbody>
         <tr *ngFor="let v of ventas">
           <td>{{ v.numero }}</td>
-          <td>{{ v.fecha }}</td>
-          <td>{{ v.rut_cliente }}</td>
-          <td>{{ v.total | number:'1.0-2' }}</td>
+          <td>{{ v.fecha | date:'dd/MM/yyyy' }}</td>
+          <td>{{ obtenerNombreCliente(v.rut_cliente) }}</td>
+          <td>${{ v.total | number:'1.0-0' }}</td>
         </tr>
       </tbody>
     </table>

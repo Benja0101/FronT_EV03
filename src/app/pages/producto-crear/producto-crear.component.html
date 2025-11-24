@@ -1,56 +1,153 @@
-<div class="container">
-  <h2>Nuevo Producto</h2>
+<div class="producto-crear-container">
+  <!-- Animated background elements -->
+  <div class="bg-animation">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
 
-  <form (ngSubmit)="crear()">
-    <div class="form-group">
-      <label>Nombre *</label>
-      <input 
-        [(ngModel)]="producto.nombre" 
-        name="nombre"
-        type="text" 
-        placeholder="Nombre del producto"
-        required>
+  <div class="content-wrapper">
+    <!-- Header -->
+    <div class="header">
+      <div class="icon-wrapper">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+          <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+          <line x1="6" y1="6" x2="6.01" y2="6"></line>
+          <line x1="6" y1="18" x2="6.01" y2="18"></line>
+        </svg>
+      </div>
+      <div>
+        <h2>Nuevo Producto</h2>
+        <p class="subtitle">Registra la información del nuevo producto</p>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label>Código *</label>
-      <input 
-        [(ngModel)]="producto.codigo" 
-        name="codigo"
-        type="text" 
-        placeholder="Código único del producto"
-        required>
-    </div>
+    <!-- Formulario -->
+    <div class="form-card">
+      <form (ngSubmit)="crear()">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                <line x1="7" y1="7" x2="7.01" y2="7"></line>
+              </svg>
+              Nombre *
+            </label>
+            <div class="input-wrapper">
+              <input 
+                [(ngModel)]="producto.nombre" 
+                name="nombre"
+                type="text" 
+                placeholder="Nombre del producto"
+                required
+                class="styled-input">
+              <div class="input-line"></div>
+            </div>
+          </div>
 
-    <div class="form-group">
-      <label>Stock *</label>
-      <input 
-        [(ngModel)]="producto.stock" 
-        name="stock"
-        type="number" 
-        placeholder="Cantidad en stock"
-        min="0"
-        required>
-    </div>
+          <div class="form-group">
+            <label>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+              </svg>
+              Código *
+            </label>
+            <div class="input-wrapper">
+              <input 
+                [(ngModel)]="producto.codigo" 
+                name="codigo"
+                type="text" 
+                placeholder="Código único del producto"
+                required
+                class="styled-input">
+              <div class="input-line"></div>
+            </div>
+          </div>
 
-    <div class="form-group">
-      <label>Precio *</label>
-      <input 
-        [(ngModel)]="producto.precio" 
-        name="precio"
-        type="number" 
-        placeholder="Precio del producto"
-        min="0"
-        step="0.01"
-        required>
-    </div>
+          <div class="form-group">
+            <label>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line>
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+              </svg>
+              Stock *
+            </label>
+            <div class="input-wrapper">
+              <input 
+                [(ngModel)]="producto.stock" 
+                name="stock"
+                type="number" 
+                placeholder="Cantidad en stock"
+                min="0"
+                required
+                class="styled-input">
+              <div class="input-line"></div>
+            </div>
+          </div>
 
-    <div *ngIf="error" class="error-message">{{ error }}</div>
-    <div *ngIf="success" class="success-message">{{ success }}</div>
+          <div class="form-group">
+            <label>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+              Precio *
+            </label>
+            <div class="input-wrapper">
+              <input 
+                [(ngModel)]="producto.precio" 
+                name="precio"
+                type="number" 
+                placeholder="Precio del producto"
+                min="0"
+                step="0.01"
+                required
+                class="styled-input">
+              <div class="input-line"></div>
+            </div>
+          </div>
+        </div>
 
-    <div class="form-actions">
-      <button type="button" class="btn-secondary" (click)="cancelar()">Cancelar</button>
-      <button type="submit" class="btn-primary">Guardar Producto</button>
+        <div *ngIf="error" class="error-message">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+          </svg>
+          <span>{{ error }}</span>
+        </div>
+
+        <div *ngIf="success" class="success-message">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          <span>{{ success }}</span>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" (click)="cancelar()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            <span>Cancelar</span>
+          </button>
+          <button type="submit" class="btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+            <span>Guardar Producto</span>
+          </button>
+        </div>
+      </form>
     </div>
-  </form>
+  </div>
 </div>

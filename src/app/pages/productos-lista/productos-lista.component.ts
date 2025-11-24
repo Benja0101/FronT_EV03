@@ -53,7 +53,7 @@ export class ProductosListaComponent implements OnInit {
   }
 
   irACrear() {
-    this.router.navigate(['/productos/crear']);
+    this.router.navigate(['/admin/productos/crear']);
   }
 
   eliminar(codigo: string) {

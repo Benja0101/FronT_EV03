@@ -34,7 +34,7 @@ export class ProductoCrearComponent {
         console.log('Producto creado', response);
         this.success = 'Producto creado exitosamente';
         setTimeout(() => {
-          this.router.navigate(['/productos']);
+          this.router.navigate(['/admin/productos']);
         }, 1500);
       },
       error: (err) => {
@@ -50,6 +50,6 @@ export class ProductoCrearComponent {
   }
 
   cancelar() {
-    this.router.navigate(['/productos']);
+    this.router.navigate(['/admin/productos']);
   }
 }

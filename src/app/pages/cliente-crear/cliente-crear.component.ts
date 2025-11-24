@@ -35,7 +35,7 @@ export class ClienteCrearComponent {
         console.log('Cliente creado', response);
         this.success = 'Cliente creado exitosamente';
         setTimeout(() => {
-          this.router.navigate(['/clientes']);
+          this.router.navigate(['/admin/clientes']);
         }, 1500);
       },
       error: (err) => {
@@ -51,6 +51,6 @@ export class ClienteCrearComponent {
   }
 
   cancelar() {
-    this.router.navigate(['/clientes']);
+    this.router.navigate(['/admin/clientes']);
   }
 }

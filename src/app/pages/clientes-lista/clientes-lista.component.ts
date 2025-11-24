@@ -53,11 +53,11 @@ export class ClientesListaComponent implements OnInit {
   }
 
   irACrear() {
-    this.router.navigate(['/clientes/crear']);
+    this.router.navigate(['/admin/clientes/crear']);
   }
 
   editar(rut: string) {
-    this.router.navigate(['/clientes/editar', rut]);
+    this.router.navigate(['/admin/clientes/editar', rut]);
   }
 
   eliminar(rut: string) {

@@ -123,6 +123,8 @@
 }
 
 .nav-link {
+  background: none;
+  border: none;
   color: #555;
   text-decoration: none;
   font-size: 1rem;
@@ -136,6 +138,9 @@
   cursor: pointer;
   position: relative;
   overflow: hidden;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
 }
 
 .nav-link::before {

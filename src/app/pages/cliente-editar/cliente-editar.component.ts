@@ -59,7 +59,7 @@ export class ClienteEditarComponent implements OnInit {
         console.log('Cliente actualizado', response);
         this.success = 'Cliente actualizado exitosamente';
         setTimeout(() => {
-          this.router.navigate(['/clientes']);
+          this.router.navigate(['/admin/clientes']);
         }, 1500);
       },
       error: (err) => {
@@ -75,6 +75,6 @@ export class ClienteEditarComponent implements OnInit {
   }
 
   cancelar() {
-    this.router.navigate(['/clientes']);
+    this.router.navigate(['/admin/clientes']);
   }
 }

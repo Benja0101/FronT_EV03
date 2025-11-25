@@ -3,7 +3,7 @@ services:
     name: techstore-frontend
     env: static
     buildCommand: npm install && npm run build
-    staticPublishPath: ./dist/cliente-web/browser
+    staticPublishPath: ./dist/cliente_web/browser
     routes:
       - type: rewrite
         source: /*

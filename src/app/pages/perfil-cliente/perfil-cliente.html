@@ -1,0 +1,246 @@
+<div class="perfil-container">
+  <!-- Navbar del cliente -->
+  <nav class="cliente-navbar">
+    <div class="nav-content">
+      <div class="brand">
+        <div class="logo-wrapper">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+        <div>
+          <h1>Mi Perfil</h1>
+          <p>Administra tu información personal</p>
+        </div>
+      </div>
+
+      <button class="btn-back" (click)="volverAlHome()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Volver al Inicio</span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="content-wrapper">
+    <!-- Formulario de búsqueda de perfil (si no hay RUT) -->
+    <div *ngIf="!cliente && !loading" class="search-card">
+      <div class="search-header">
+        <div class="icon-wrapper">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+        </div>
+        <h2>Buscar Mi Perfil</h2>
+        <p>Ingresa tu RUT para ver y editar tu información</p>
+      </div>
+
+      <div class="form-group">
+        <label>RUT</label>
+        <input 
+          [(ngModel)]="rutCliente" 
+          type="text" 
+          placeholder="12.345.678-9"
+          class="styled-input"
+          (keyup.enter)="buscarPerfil()">
+      </div>
+
+      <button class="btn-search" (click)="buscarPerfil()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <span>Buscar Perfil</span>
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-card">
+      <div class="spinner-large"></div>
+      <p>Cargando perfil...</p>
+    </div>
+
+    <!-- Perfil encontrado -->
+    <div *ngIf="cliente && !loading" class="perfil-card">
+      <div class="perfil-header">
+        <div class="avatar">
+          <span>{{ cliente.nombre[0] }}{{ cliente.apellido[0] }}</span>
+        </div>
+        <div class="header-info">
+          <h2>{{ cliente.nombre }} {{ cliente.apellido }}</h2>
+          <p class="rut-badge">RUT: {{ cliente.rut }}</p>
+          <span *ngIf="cliente.nombre === 'Cliente' && cliente.apellido === 'Web'" class="temp-badge">
+            Cliente Temporal
+          </span>
+          <span *ngIf="cliente.nombre !== 'Cliente' || cliente.apellido !== 'Web'" class="registered-badge">
+            Cliente Registrado
+          </span>
+        </div>
+      </div>
+
+      <!-- Mensajes -->
+      <div *ngIf="error" class="error-message">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+        <span>{{ error }}</span>
+      </div>
+
+      <div *ngIf="success" class="success-message">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <span>{{ success }}</span>
+      </div>
+
+      <!-- Vista de solo lectura -->
+      <div *ngIf="!editando" class="info-section">
+        <div class="info-item">
+          <div class="info-label">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Nombre</span>
+          </div>
+          <div class="info-value">{{ cliente.nombre }}</div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Apellido</span>
+          </div>
+          <div class="info-value">{{ cliente.apellido }}</div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            <span>Email</span>
+          </div>
+          <div class="info-value">{{ cliente.email || 'No especificado' }}</div>
+        </div>
+
+        <div class="info-item">
+          <div class="info-label">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span>Comuna</span>
+          </div>
+          <div class="info-value">{{ cliente.comuna }}</div>
+        </div>
+
+        <button class="btn-edit" (click)="iniciarEdicion()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+          <span>Editar Perfil</span>
+        </button>
+      </div>
+
+      <!-- Formulario de edición -->
+      <div *ngIf="editando" class="edit-section">
+        <form (ngSubmit)="guardarCambios()">
+          <div class="form-group">
+            <label>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              Nombre *
+            </label>
+            <input 
+              [(ngModel)]="datosEdicion.nombre" 
+              name="nombre"
+              type="text" 
+              required
+              class="styled-input">
+          </div>
+
+          <div class="form-group">
+            <label>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              Apellido *
+            </label>
+            <input 
+              [(ngModel)]="datosEdicion.apellido" 
+              name="apellido"
+              type="text" 
+              required
+              class="styled-input">
+          </div>
+
+          <div class="form-group">
+            <label>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              Email
+            </label>
+            <input 
+              [(ngModel)]="datosEdicion.email" 
+              name="email"
+              type="email"
+              class="styled-input">
+          </div>
+
+          <div class="form-group">
+            <label>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              Comuna *
+            </label>
+            <input 
+              [(ngModel)]="datosEdicion.comuna" 
+              name="comuna"
+              type="text" 
+              required
+              class="styled-input">
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" (click)="cancelarEdicion()">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              <span>Cancelar</span>
+            </button>
+            <button type="submit" class="btn-save" [disabled]="loading">
+              <div *ngIf="loading" class="spinner"></div>
+              <svg *ngIf="!loading" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <span *ngIf="!loading">Guardar Cambios</span>
+              <span *ngIf="loading">Guardando...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

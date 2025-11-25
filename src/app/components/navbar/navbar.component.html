@@ -16,6 +16,17 @@
     
     <ul class="navbar-menu">
       <li>
+        <button type="button" (click)="navigateTo('/admin/dashboard')" [class.active]="router.url.includes('/admin/dashboard')" class="nav-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span>Dashboard</span>
+        </button>
+      </li>
+      <li>
         <button type="button" (click)="navigateTo('/admin/productos')" [class.active]="router.url.includes('/admin/productos')" class="nav-link">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>

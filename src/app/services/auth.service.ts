@@ -23,9 +23,7 @@ export class AuthService {
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
   constructor(private http: HttpClient) {
-    console.log('🔧 AuthService inicializado');
-    console.log('🌐 HttpClient disponible:', !!this.http);
-    console.log('🔗 API URL configurada:', this.apiUrl);
+    // AuthService inicializado
   }
 
   private hasToken(): boolean {

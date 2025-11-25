@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -39,8 +40,8 @@ export class Login {
           const token = localStorage.getItem('access_token');
           if (token) {
             console.log('✅ Token confirmado en localStorage:', token.substring(0, 20) + '...');
-            console.log('🔄 Redirigiendo a productos...');
-            this.router.navigate(['/productos']);
+            console.log('🔄 Redirigiendo a dashboard...');
+            this.router.navigate(['admin/dashboard']);
           } else {
             console.error('❌ Token no encontrado después del login');
             this.error = 'Error al guardar la sesión. Intente nuevamente.';
@@ -51,5 +52,10 @@ export class Login {
           this.error = err.error?.detail || 'Credenciales inválidas. Intente nuevamente.';
         }
       });
+  }
+
+  goToClientHome() {
+    console.log('🏠 Navegando a home de clientes');
+    this.router.navigate(['cliente/home']);
   }
 }

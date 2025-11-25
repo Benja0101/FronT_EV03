@@ -65,6 +65,7 @@
                   name="correo"
                   type="email" 
                   placeholder="ejemplo@correo.com"
+                  (blur)="buscarClientePorEmail()"
                   required
                   class="styled-input">
                 <div class="input-line"></div>
@@ -85,11 +86,40 @@
                   name="rut"
                   type="text" 
                   placeholder="12.345.678-9"
+                  (blur)="buscarClientePorRut()"
                   required
                   class="styled-input">
                 <div class="input-line"></div>
               </div>
             </div>
+
+            <!-- Mostrar datos cargados si es cliente registrado -->
+            <div *ngIf="esClienteRegistrado && clienteEncontrado" class="cliente-info">
+              <div class="info-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+              </div>
+              <div>
+                <strong>¡Bienvenido de vuelta!</strong>
+                <p>{{ registroData.nombre }} {{ registroData.apellido }} - {{ registroData.comuna }}</p>
+              </div>
+            </div>
+
+            <!-- Botón para registrarse (opcional) -->
+            <button 
+              *ngIf="!esClienteRegistrado && !yaCompro && clienteData.correo && clienteData.rut"
+              type="button"
+              class="btn-registro-opcional"
+              (click)="abrirModalParaRegistro()">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="8.5" cy="7" r="4"></circle>
+                <polyline points="17 11 19 13 23 9"></polyline>
+              </svg>
+              <span>¿Quieres ser Cliente Habitual?</span>
+            </button>
 
             <div *ngIf="error" class="error-message">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -174,6 +204,87 @@
             <span>Compra Segura y Protegida</span>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Registro Opcional -->
+  <div class="modal-overlay" *ngIf="mostrarModalRegistro" (click)="cerrarModalRegistro()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="8.5" cy="7" r="4"></circle>
+            <polyline points="17 11 19 13 23 9"></polyline>
+          </svg>
+        </div>
+        <h3>¿Quieres ser Cliente Habitual?</h3>
+        <p>Regístrate y guarda tus datos para futuras compras más rápidas</p>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            Nombre *
+          </label>
+          <input 
+            [(ngModel)]="registroData.nombre" 
+            type="text" 
+            placeholder="Ingresa tu nombre"
+            class="styled-input">
+        </div>
+
+        <div class="form-group">
+          <label>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            Apellido *
+          </label>
+          <input 
+            [(ngModel)]="registroData.apellido" 
+            type="text" 
+            placeholder="Ingresa tu apellido"
+            class="styled-input">
+        </div>
+
+        <div class="form-group">
+          <label>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            Comuna *
+          </label>
+          <input 
+            [(ngModel)]="registroData.comuna" 
+            type="text" 
+            placeholder="Ingresa tu comuna"
+            class="styled-input">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-modal btn-register" (click)="confirmarRegistro()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+          <span>Sí, Registrarme</span>
+        </button>
+        <button class="btn-modal btn-skip" (click)="omitirRegistro()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          <span>No, Continuar sin Registro</span>
+        </button>
       </div>
     </div>
   </div>

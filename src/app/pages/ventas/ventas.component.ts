@@ -20,12 +20,22 @@ export class VentasComponent implements OnInit {
   };
   
   ventas: Venta[] = [];
+  ventasFiltradas: Venta[] = [];
   clientes: Cliente[] = [];
   productos: Producto[] = [];
   
   loading = false;
   error = '';
   success = '';
+
+  // Filtrado y búsqueda
+  terminoBusqueda = '';
+
+  // Modal de detalle
+  mostrarModal = false;
+  ventaSeleccionada: Venta | null = null;
+  detallesVenta: DetalleVenta[] = [];
+  loadingDetalle = false;
 
   constructor(
     private ventaService: VentaService,
@@ -71,7 +81,15 @@ export class VentasComponent implements OnInit {
       next: (response) => {
         console.log('✅ Ventas recibidas:', response);
         this.ventas = response.results || [];
+        // Ordenar por fecha descendente (más recientes primero)
+        this.ventas.sort((a, b) => {
+          const fechaA = new Date(a.fecha).getTime();
+          const fechaB = new Date(b.fecha).getTime();
+          return fechaB - fechaA;
+        });
+        this.ventasFiltradas = [...this.ventas];
         console.log('📦 Ventas procesadas:', this.ventas.length);
+        console.log('📦 Ventas filtradas:', this.ventasFiltradas.length);
         this.loading = false;
         console.log('✅ Loading = false');
         // Forzar detección de cambios
@@ -129,5 +147,92 @@ export class VentasComponent implements OnInit {
       return `${rut_cliente.nombre} ${rut_cliente.apellido}`;
     }
     return rut_cliente || 'Sin cliente';
+  }
+
+  // Abrir modal con detalle de venta
+  verDetalle(venta: Venta) {
+    console.log('🔵 Abriendo detalle para venta:', venta.numero);
+    this.ventaSeleccionada = venta;
+    this.mostrarModal = true;
+    this.loadingDetalle = true;
+    this.detallesVenta = [];
+
+    this.ventaService.getDetallesDeVenta(venta.numero).subscribe({
+      next: (response) => {
+        console.log('✅ Detalles recibidos:', response);
+        console.log('📦 Cantidad de detalles:', response.results?.length || 0);
+        this.detallesVenta = response.results || [];
+        this.loadingDetalle = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('❌ Error al cargar detalles:', err);
+        console.error('❌ Status:', err.status);
+        console.error('❌ URL:', err.url);
+        console.error('❌ Error completo:', err.error);
+        this.loadingDetalle = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // Cerrar modal
+  cerrarModal() {
+    this.mostrarModal = false;
+    this.ventaSeleccionada = null;
+    this.detallesVenta = [];
+  }
+
+  // Filtrar ventas por búsqueda
+  filtrarVentas() {
+    if (!this.terminoBusqueda || !this.terminoBusqueda.trim()) {
+      this.ventasFiltradas = [...this.ventas];
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const termino = this.terminoBusqueda.toLowerCase().trim();
+    this.ventasFiltradas = this.ventas.filter(venta => {
+      // Buscar por número de venta
+      if (venta.numero.toLowerCase().includes(termino)) {
+        return true;
+      }
+
+      // Buscar por fecha (formato dd/mm/yyyy)
+      const fecha = new Date(venta.fecha);
+      const fechaFormateada = `${fecha.getDate().toString().padStart(2, '0')}/${(fecha.getMonth() + 1).toString().padStart(2, '0')}/${fecha.getFullYear()}`;
+      if (fechaFormateada.includes(termino)) {
+        return true;
+      }
+
+      // Buscar por datos del cliente
+      if (typeof venta.rut_cliente === 'object' && venta.rut_cliente !== null) {
+        const cliente = venta.rut_cliente;
+        const nombreCompleto = `${cliente.nombre} ${cliente.apellido}`.toLowerCase();
+        const email = (cliente.email || '').toLowerCase();
+        const rut = cliente.rut.toLowerCase();
+        
+        if (nombreCompleto.includes(termino) || email.includes(termino) || rut.includes(termino)) {
+          return true;
+        }
+      } else if (typeof venta.rut_cliente === 'string') {
+        if (venta.rut_cliente.toLowerCase().includes(termino)) {
+          return true;
+        }
+      }
+
+      return false;
+    });
+  }
+
+  // Obtener nombre del producto
+  obtenerNombreProducto(producto: any): string {
+    // Si el producto es un objeto, usar su nombre directamente
+    if (typeof producto === 'object' && producto !== null) {
+      return producto.nombre || 'Producto sin nombre';
+    }
+    // Si es un string (código), buscar en la lista de productos
+    const prod = this.productos.find(p => p.codigo === producto);
+    return prod ? prod.nombre : producto;
   }
 }

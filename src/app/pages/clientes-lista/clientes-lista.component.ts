@@ -55,23 +55,4 @@ export class ClientesListaComponent implements OnInit {
   irACrear() {
     this.router.navigate(['/admin/clientes/crear']);
   }
-
-  editar(rut: string) {
-    this.router.navigate(['/admin/clientes/editar', rut]);
-  }
-
-  eliminar(rut: string) {
-    if (confirm('¿Está seguro de eliminar este cliente?')) {
-      this.clienteService.deleteCliente(rut).subscribe({
-        next: () => {
-          console.log('Cliente eliminado');
-          this.cargarClientes();
-        },
-        error: (err) => {
-          console.error('Error al eliminar', err);
-          this.error = 'Error al eliminar el cliente.';
-        }
-      });
-    }
-  }
 }

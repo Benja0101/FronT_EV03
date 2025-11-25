@@ -22,7 +22,6 @@ export interface PaginatedResponse<T> {
   providedIn: 'root'
 })
 export class ClienteService {
-  // Django no tiene /api/clientes/, solo /clientes/
   private apiUrl = 'http://127.0.0.1:8000/clientes/api/clientes/';
 
   constructor(private http: HttpClient) {}

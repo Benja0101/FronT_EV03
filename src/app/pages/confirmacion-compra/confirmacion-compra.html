@@ -1,0 +1,140 @@
+<div class="confirmacion-container">
+  <!-- Confetti animado -->
+  <div class="confetti-container" *ngIf="mostrarConfetti">
+    <div class="confetti" *ngFor="let i of [].constructor(50); let idx = index" [style.left.%]="(idx * 2)" [style.animation-delay.s]="idx * 0.1"></div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="content-wrapper" *ngIf="pagoData">
+    <!-- Animación de éxito -->
+    <div class="success-animation">
+      <div class="success-circle">
+        <div class="checkmark-container">
+          <svg class="checkmark" viewBox="0 0 52 52">
+            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+            <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Título -->
+    <h1 class="title">¡Compra Realizada con Éxito!</h1>
+    <p class="subtitle">Tu pedido ha sido procesado correctamente</p>
+
+    <!-- Card de confirmación -->
+    <div class="confirmacion-card">
+      <!-- Número de orden -->
+      <div class="order-header">
+        <div class="order-number">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <div>
+            <span class="label">Número de Orden</span>
+            <span class="value">{{ pagoData.numero }}</span>
+          </div>
+        </div>
+        <div class="order-date">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <span class="label">Fecha</span>
+            <span class="value">{{ formatearFecha(pagoData.fechaPago) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Detalles de pago -->
+      <div class="payment-details">
+        <h3>Detalles de Pago</h3>
+        
+        <div class="detail-row">
+          <span class="detail-label">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            </svg>
+            Método de Pago
+          </span>
+          <span class="detail-value">{{ pagoData.metodoPago }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            Tarjeta terminada en
+          </span>
+          <span class="detail-value">•••• {{ pagoData.ultimos4Digitos }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            Productos
+          </span>
+          <span class="detail-value">{{ pagoData.productos?.length || 0 }} items</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Lista de productos -->
+      <div class="products-list">
+        <h3>Productos Comprados</h3>
+        <div class="product-item" *ngFor="let producto of pagoData.productos">
+          <div class="product-info">
+            <span class="product-name">{{ producto.nombre }}</span>
+            <span class="product-quantity">x{{ producto.cantidad }}</span>
+          </div>
+          <span class="product-price">${{ producto.precio * producto.cantidad | number:'1.0-0' }}</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Total -->
+      <div class="total-section">
+        <span class="total-label">Total Pagado</span>
+        <span class="total-amount">${{ pagoData.total | number:'1.0-0' }}</span>
+      </div>
+
+      <!-- Información del cliente -->
+      <div class="client-info" *ngIf="pagoData.cliente">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+        <span>{{ pagoData.cliente }}</span>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="action-buttons">
+      <button class="btn-secondary" (click)="descargarComprobante()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        Descargar Comprobante
+      </button>
+      
+      <button class="btn-primary" (click)="volverAlHome()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+        Volver al Inicio
+      </button>
+    </div>
+
+    <!-- Mensaje de agradecimiento -->
+    <div class="thank-you-message">
+      <p>¡Gracias por tu compra! 🎉</p>
+      <p class="small">Recibirás un correo de confirmación con los detalles de tu pedido.</p>
+    </div>
+  </div>
+</div>

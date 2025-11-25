@@ -18,11 +18,19 @@ export interface Venta {
   total: number;
 }
 
+export interface ProductoEnDetalle {
+  codigo: string;
+  nombre: string;
+  precio: number;
+  stock: number;
+}
+
 export interface DetalleVenta {
   venta: string;
-  producto: string;
+  producto: ProductoEnDetalle | string; // Puede ser objeto anidado o solo el código
   cantidad: number;
   precio_unitario: number;
+  subtotal?: number;
 }
 
 export interface PaginatedResponse<T> {
@@ -71,6 +79,16 @@ export class VentaService {
   // Detalles de Venta
   getDetallesVenta(page: number = 1): Observable<PaginatedResponse<DetalleVenta>> {
     const params = new HttpParams().set('page', page.toString());
+    return this.http.get<PaginatedResponse<DetalleVenta>>(this.detalleUrl, { params });
+  }
+
+  getDetallesDeVenta(numeroVenta: string): Observable<PaginatedResponse<DetalleVenta>> {
+    // Filtrar por número de venta específico
+    const params = new HttpParams()
+      .set('venta', numeroVenta)
+      .set('page_size', '1000');
+    console.log('🔍 Consultando detalles con URL:', this.detalleUrl);
+    console.log('🔍 Parámetros:', params.toString());
     return this.http.get<PaginatedResponse<DetalleVenta>>(this.detalleUrl, { params });
   }
 

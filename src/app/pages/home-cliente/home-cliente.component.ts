@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ProductoService } from '../../services/producto.service';
@@ -20,7 +20,8 @@ export class HomeClienteComponent implements OnInit {
   constructor(
     private productoService: ProductoService,
     private carritoService: CarritoService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -28,16 +29,26 @@ export class HomeClienteComponent implements OnInit {
     this.carritoService.carrito$.subscribe(() => {
       this.carritoCount = this.carritoService.obtenerCantidadTotal();
     });
+    
+    // Scroll automático a la sección de productos después de un breve delay
+    setTimeout(() => {
+      this.scrollToProductos();
+    }, 800);
   }
 
   cargarProductos() {
+    this.productos = []; // Limpiar array antes de cargar
     this.productoService.getAllProductos().subscribe({
       next: (data: any) => {
-        this.productos = data.results;
+        this.productos = data.results || [];
+        this.cdr.detectChanges(); // Forzar detección de cambios
       },
       error: (err: any) => {
+        console.error('❌ HomeCliente - Error al cargar productos:', err);
+        console.error('Status:', err.status);
+        console.error('Message:', err.message);
         this.error = 'Error al cargar los productos';
-        console.error(err);
+        this.cdr.detectChanges(); // Forzar detección de cambios también en error
       }
     });
   }
@@ -57,7 +68,13 @@ export class HomeClienteComponent implements OnInit {
   }
 
   irAlAdmin() {
-    this.router.navigate(['/login']);
+    // Si ya hay un token de acceso, ir directamente al dashboard
+    const accessToken = localStorage.getItem('access_token');
+    if (accessToken) {
+      this.router.navigate(['/admin/dashboard']);
+    } else {
+      this.router.navigate(['/login']);
+    }
   }
 
   scrollToProductos() {

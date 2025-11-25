@@ -10,22 +10,44 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   
   // Permitir requests a endpoints de token sin autenticación
   if (req.url.includes('/token/')) {
-    console.log('🔵 Interceptor - Request a endpoint de token:', req.url);
     return next(req);
+  }
+  
+  // Permitir requests públicas (sin token para clientes)
+  const publicEndpoints = [
+    { method: 'GET', path: '/productos/' },
+    { method: 'POST', path: '/venta/' },
+    { method: 'POST', path: '/clientes/' },
+    { method: 'PUT', path: '/clientes/' },
+    { method: 'GET', path: '/clientes/' }
+  ];
+  
+  for (const endpoint of publicEndpoints) {
+    if (req.method === endpoint.method && req.url.includes(endpoint.path)) {
+      const token = localStorage.getItem('access_token');
+      
+      // Si hay token, agregarlo (para administradores)
+      if (token) {
+        const clonedRequest = req.clone({
+          setHeaders: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        return next(clonedRequest);
+      }
+      
+      // Si no hay token, dejar pasar sin autenticación (para clientes públicos)
+      return next(req);
+    }
   }
   
   const token = localStorage.getItem('access_token');
   
-  console.log('🔵 Interceptor - Request a:', req.url);
-  console.log('🔑 Token presente:', !!token);
-  
   // Si no hay token, dejar pasar la request sin Authorization header
   // El servidor responderá con 401/403 y el guard se encargará de la redirección
   if (!token) {
-    console.warn('⚠️ No hay token disponible para la request');
     return next(req).pipe(
       catchError((error: HttpErrorResponse) => {
-        console.error('❌ Error en request sin token:', error.status);
         return throwError(() => error);
       })
     );

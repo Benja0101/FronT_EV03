@@ -22,7 +22,7 @@ export interface PaginatedResponse<T> {
   providedIn: 'root'
 })
 export class ClienteService {
-  private apiUrl = 'https://web-production-a25f6.up.railway.app/clientes/api/clientes/';
+  private apiUrl = 'https://heroic-transformation-production.up.railway.app/clientes/api/clientes/';
 
   constructor(private http: HttpClient) {}
 

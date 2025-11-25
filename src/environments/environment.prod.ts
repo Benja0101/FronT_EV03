@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://web-production-a25f6.up.railway.app/api/'
+  apiUrl: 'https://heroic-transformation-production.up.railway.app/api/'
 };

@@ -1,5 +1,5 @@
 <div class="chatbot-container">
-  
+
   <!-- Botón flotante -->
   <button class="chat-toggle-btn" (click)="toggleChat()" [class.chat-open]="chatAbierto">
     <span *ngIf="!chatAbierto">💬</span>
@@ -14,8 +14,8 @@
       <div class="header-content">
         <span class="bot-icon">🤖</span>
         <div class="header-text">
-          <h3>Asistente Virtual</h3>
-          <p class="status">Disponible</p>
+          <h3>ChatGPT</h3>
+          <p class="status">Online</p>
         </div>
       </div>
       <button class="close-btn" (click)="toggleChat()">✕</button>
@@ -23,29 +23,34 @@
 
     <!-- Mensajes -->
     <div class="chat-mensajes">
+
       <div *ngFor="let mensaje of mensajes"
+           class="mensaje"
            [class.mensaje-bot]="mensaje.tipo === 'bot'"
-           [class.mensaje-usuario]="mensaje.tipo === 'usuario'"
-           class="mensaje">
+           [class.mensaje-usuario]="mensaje.tipo === 'usuario'">
+
         <p>{{ mensaje.contenido }}</p>
         <span class="timestamp">{{ mensaje.timestamp | date:'HH:mm' }}</span>
       </div>
 
-      <!-- Indicador typing -->
+      <!-- Typing indicator -->
       <div *ngIf="cargando" class="mensaje mensaje-bot">
         <div class="typing-indicator">
           <span></span><span></span><span></span>
         </div>
       </div>
+
     </div>
 
     <!-- Input -->
     <div class="chat-input-container">
+
       <input 
+        type="text"
         class="chat-input"
         [(ngModel)]="mensajeInput"
+        placeholder="Enviar un mensaje..."
         (keypress)="onKeyPress($event)"
-        placeholder="Escribe tu mensaje..."
         [disabled]="cargando"
       >
 

@@ -1,13 +1,15 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { ProductoService } from '../../services/producto.service';
+import { ProductoService, Producto, getBeneficiosArray, getPalabrasClave } from '../../services/producto.service';
 import { CarritoService } from '../../services/carrito.service';
+import { AuthService } from '../../services/auth.service';
+import { RecomendacionesIAComponent } from '../../components/recomendaciones-ia/recomendaciones-ia.component';
 
 @Component({
   selector: 'app-home-cliente',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RecomendacionesIAComponent],
   templateUrl: './home-cliente.component.html',
   styleUrl: './home-cliente.component.css'
 })
@@ -16,12 +18,20 @@ export class HomeClienteComponent implements OnInit {
   carritoCount: number = 0;
   error: string = '';
   success: string = '';
+  clienteRut: string = '';
+  
+  // ⭐ Modal de detalles
+  mostrarModalDetalle = false;
+  productoSeleccionado: Producto | null = null;
+  beneficiosProducto: string[] = [];
+  palabrasClaveProducto: string[] = [];
 
   constructor(
     private productoService: ProductoService,
     private carritoService: CarritoService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -29,6 +39,12 @@ export class HomeClienteComponent implements OnInit {
     this.carritoService.carrito$.subscribe(() => {
       this.carritoCount = this.carritoService.obtenerCantidadTotal();
     });
+    
+    // Obtener RUT del cliente logueado desde localStorage si está disponible
+    const rutCliente = localStorage.getItem('cliente_rut');
+    if (rutCliente) {
+      this.clienteRut = rutCliente;
+    }
     
     // Scroll automático a la sección de productos después de un breve delay
     setTimeout(() => {
@@ -82,6 +98,29 @@ export class HomeClienteComponent implements OnInit {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  }
+
+  verDetalles(producto: Producto) {
+    this.productoSeleccionado = producto;
+    
+    // Parsear beneficios y palabras clave
+    this.beneficiosProducto = getBeneficiosArray(producto);
+    this.palabrasClaveProducto = getPalabrasClave(producto);
+    
+    this.mostrarModalDetalle = true;
+    
+    // Prevenir scroll del body cuando el modal está abierto
+    document.body.style.overflow = 'hidden';
+  }
+
+  cerrarModalDetalle() {
+    this.mostrarModalDetalle = false;
+    this.productoSeleccionado = null;
+    this.beneficiosProducto = [];
+    this.palabrasClaveProducto = [];
+    
+    // Restaurar scroll del body
+    document.body.style.overflow = 'auto';
   }
 
   mostrarMensaje(mensaje: string, tipo: 'error' | 'success') {

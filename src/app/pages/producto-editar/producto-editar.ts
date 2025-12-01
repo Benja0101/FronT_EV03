@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ProductoService, Producto } from '../../services/producto.service';
+import { IAService, DescripcionProducto } from '../../services/ia.service';
 
 @Component({
   selector: 'app-producto-editar',
@@ -20,11 +21,13 @@ export class ProductoEditar implements OnInit {
   loading = false;
   error = '';
   success = '';
+  cargandoDescripcion = false;
 
   constructor(
     private productoService: ProductoService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private iaService: IAService
   ) {}
 
   ngOnInit() {
@@ -75,5 +78,31 @@ export class ProductoEditar implements OnInit {
 
   cancelar() {
     this.router.navigate(['/admin/productos']);
+  }
+
+  generarDescripcionIA() {
+    if (!this.producto.id) {
+      this.error = 'Producto no válido para generar descripción';
+      return;
+    }
+
+    this.cargandoDescripcion = true;
+    this.error = '';
+
+    this.iaService.generarDescripcion(this.producto.id).subscribe({
+      next: (data: DescripcionProducto) => {
+        console.log('Descripción generada:', data);
+        
+        // Actualizar el producto con la descripción generada
+        this.producto.descripcion = data.descripcion_larga;
+        this.success = '✅ Descripción generada con IA. Guarda los cambios para aplicarla.';
+        this.cargandoDescripcion = false;
+      },
+      error: (err) => {
+        console.error('Error al generar descripción:', err);
+        this.error = '❌ Error al generar descripción con IA';
+        this.cargandoDescripcion = false;
+      }
+    });
   }
 }

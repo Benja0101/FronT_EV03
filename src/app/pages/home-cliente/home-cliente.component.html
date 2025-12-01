@@ -173,6 +173,13 @@
       </div>
     </section>
 
+    <!-- Recomendaciones IA Section -->
+    <app-recomendaciones-ia 
+      *ngIf="clienteRut"
+      [rutCliente]="clienteRut"
+      [limite]="4">
+    </app-recomendaciones-ia>
+
     <!-- Productos Section -->
     <section class="productos-section" id="productos">
     <div class="header">
@@ -204,23 +211,16 @@
         <div class="producto-info">
           <h3>{{ producto.nombre }}</h3>
           
-          <div class="producto-detalles">
-            <div class="badge codigo-badge">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-              </svg>
-              {{ producto.codigo }}
-            </div>
-            <div class="badge stock-badge" [class.sin-stock]="producto.stock <= 0">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line>
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                <line x1="12" y1="22.08" x2="12" y2="12"></line>
-              </svg>
-              {{ producto.stock }} disponibles
-            </div>
+          <!-- Badge de stock simplificado -->
+          <div class="stock-simple" [class.sin-stock]="producto.stock <= 0">
+            <span class="stock-dot" [class.sin-stock-dot]="producto.stock <= 0"></span>
+            {{ producto.stock > 0 ? 'En stock (' + producto.stock + ')' : 'Sin stock' }}
+          </div>
+
+          <!-- Descripción corta IA si existe -->
+          <div class="descripcion-corta" *ngIf="producto.descripcion_corta">
+            <p>{{ producto.descripcion_corta }}</p>
+            <span class="badge-ia">🤖 Con IA</span>
           </div>
 
           <div class="precio">
@@ -231,17 +231,29 @@
             ${{ producto.precio | number:'1.0-0' }}
           </div>
 
-          <button 
-            class="btn-add-cart" 
-            (click)="agregarAlCarrito(producto)"
-            [disabled]="producto.stock <= 0">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="9" cy="21" r="1"></circle>
-              <circle cx="20" cy="21" r="1"></circle>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-            </svg>
-            {{ producto.stock > 0 ? 'Añadir al Carrito' : 'Sin Stock' }}
-          </button>
+          <div class="card-actions">
+            <button 
+              class="btn-ver-detalles" 
+              (click)="verDetalles(producto)">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              Ver Detalles
+            </button>
+            <button 
+              class="btn-add-cart" 
+              (click)="agregarAlCarrito(producto)"
+              [disabled]="producto.stock <= 0">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+              </svg>
+              {{ producto.stock > 0 ? 'Añadir' : 'Sin Stock' }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -256,5 +268,87 @@
       <p>No hay productos disponibles</p>
     </div>
     </section>
+  </div>
+
+  <!-- ⭐ Modal de Detalles del Producto -->
+  <div class="modal-overlay" *ngIf="mostrarModalDetalle" (click)="cerrarModalDetalle()">
+    <div class="modal-detalle-content" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="cerrarModalDetalle()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="modal-detalle-header">
+        <div class="producto-icon-large">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+          </svg>
+        </div>
+        <h2>{{ productoSeleccionado?.nombre }}</h2>
+        <div class="modal-meta">
+          <span class="codigo-detalle">Código: {{ productoSeleccionado?.codigo }}</span>
+          <span class="stock-detalle" [class.sin-stock]="(productoSeleccionado?.stock ?? 0) <= 0">
+            <span class="stock-dot" [class.sin-stock-dot]="(productoSeleccionado?.stock ?? 0) <= 0"></span>
+            {{ (productoSeleccionado?.stock ?? 0) > 0 ? (productoSeleccionado?.stock ?? 0) + ' disponibles' : 'Sin stock' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="modal-detalle-body">
+        <!-- Descripción Larga IA -->
+        <div class="descripcion-larga" *ngIf="productoSeleccionado?.descripcion_larga">
+          <h3>📝 Descripción Detallada</h3>
+          <p>{{ productoSeleccionado?.descripcion_larga }}</p>
+          <span class="badge-ia-modal">🤖 Generado con Inteligencia Artificial</span>
+        </div>
+
+        <!-- Beneficios -->
+        <div class="beneficios-section" *ngIf="beneficiosProducto.length > 0">
+          <h3>✨ Beneficios</h3>
+          <ul class="beneficios-list">
+            <li *ngFor="let beneficio of beneficiosProducto">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              {{ beneficio }}
+            </li>
+          </ul>
+        </div>
+
+        <!-- Palabras Clave -->
+        <div class="keywords-section" *ngIf="palabrasClaveProducto.length > 0">
+          <h3>🏷️ Etiquetas</h3>
+          <div class="keywords-list">
+            <span class="keyword-tag" *ngFor="let keyword of palabrasClaveProducto">
+              {{ keyword }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Precio y acción -->
+        <div class="precio-seccion">
+          <div class="precio-grande">
+            <span class="precio-label">Precio</span>
+            <span class="precio-valor">${{ productoSeleccionado?.precio | number:'1.0-0' }}</span>
+          </div>
+          <button 
+            class="btn-add-cart-modal" 
+            (click)="productoSeleccionado && agregarAlCarrito(productoSeleccionado); cerrarModalDetalle()"
+            [disabled]="(productoSeleccionado?.stock ?? 0) <= 0">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            {{ (productoSeleccionado?.stock ?? 0) > 0 ? 'Añadir al Carrito' : 'Sin Stock' }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

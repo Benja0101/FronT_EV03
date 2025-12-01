@@ -1,0 +1,54 @@
+<div class="recomendaciones-container" *ngIf="recomendaciones.length > 0 || cargando">
+  <div class="header-ia">
+    <h3>🤖 Recomendaciones Inteligentes</h3>
+    <p class="mensaje-ia">{{ mensaje }}</p>
+  </div>
+
+  <div class="loading-container" *ngIf="cargando">
+    <div class="spinner"></div>
+    <p>Analizando tus preferencias con IA...</p>
+  </div>
+
+  <div class="error-message" *ngIf="error">
+    {{ error }}
+  </div>
+
+  <div class="productos-grid" *ngIf="!cargando && !error">
+    <div *ngFor="let producto of recomendaciones" 
+         class="producto-card"
+         (click)="verProducto(producto.producto_id)">
+      
+      <div class="producto-header">
+        <h4>{{ producto.nombre }}</h4>
+        <span class="badge" [ngClass]="getConfianzaClass(producto.confianza)">
+          {{ producto.confianza }}
+        </span>
+      </div>
+
+      <div class="producto-info">
+        <p class="precio">${{ producto.precio | number:'1.0-0' }}</p>
+        <p class="stock" *ngIf="producto.stock > 0">
+          {{ producto.stock }} disponibles
+        </p>
+        <p class="sin-stock" *ngIf="producto.stock === 0">
+          Sin stock
+        </p>
+      </div>
+
+      <div class="ia-reasoning">
+        <p class="razon">
+          <span class="icon">💡</span>
+          {{ producto.razon }}
+        </p>
+      </div>
+
+      <button 
+        class="btn-agregar"
+        (click)="agregarAlCarrito(producto.producto_id, $event)"
+        [disabled]="producto.stock === 0">
+        <span *ngIf="producto.stock > 0">Agregar al Carrito</span>
+        <span *ngIf="producto.stock === 0">Sin Stock</span>
+      </button>
+    </div>
+  </div>
+</div>

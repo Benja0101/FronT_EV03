@@ -113,6 +113,23 @@
           </div>
         </div>
 
+        <!-- Campo de Descripción -->
+        <div class="form-group form-group-full">
+          <label>
+            📝 Descripción (Generada con IA)
+          </label>
+          <div class="input-wrapper">
+            <textarea 
+              [(ngModel)]="producto.descripcion" 
+              name="descripcion"
+              rows="4"
+              placeholder="La descripción se generará automáticamente con IA al hacer clic en el botón '🤖 Generar con IA'"
+              class="styled-input">
+            </textarea>
+            <div class="input-line"></div>
+          </div>
+        </div>
+
         <div *ngIf="error" class="error-message">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
@@ -137,6 +154,14 @@
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
             <span>Cancelar</span>
+          </button>
+          <button 
+            type="button" 
+            class="btn-ia" 
+            (click)="generarDescripcionIA()"
+            [disabled]="cargandoDescripcion || !producto.nombre || !producto.codigo">
+            <span *ngIf="!cargandoDescripcion">🤖 Generar con IA</span>
+            <span *ngIf="cargandoDescripcion">Generando...</span>
           </button>
           <button type="submit" class="btn-primary">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

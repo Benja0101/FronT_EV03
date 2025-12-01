@@ -1,0 +1,68 @@
+<div class="chatbot-container">
+  <!-- Botón flotante para abrir/cerrar chat -->
+  <button class="chat-toggle-btn" (click)="toggleChat()" [class.chat-open]="chatAbierto">
+    <span *ngIf="!chatAbierto">💬</span>
+    <span *ngIf="chatAbierto">✕</span>
+  </button>
+
+  <!-- Ventana de chat -->
+  <div class="chat-window" [class.open]="chatAbierto">
+    <div class="chat-header">
+      <div class="header-content">
+        <span class="bot-icon">🤖</span>
+        <div class="header-text">
+          <h3>Asistente Virtual</h3>
+          <p class="status">En línea</p>
+        </div>
+      </div>
+      <button class="close-btn" (click)="toggleChat()">✕</button>
+    </div>
+
+    <div class="chat-mensajes">
+      <div *ngFor="let mensaje of mensajes" 
+           class="mensaje"
+           [class.mensaje-usuario]="mensaje.tipo === 'usuario'"
+           [class.mensaje-bot]="mensaje.tipo === 'bot'">
+        <div class="mensaje-contenido">
+          <p>{{ mensaje.contenido }}</p>
+          <span class="timestamp">{{ mensaje.timestamp | date:'HH:mm' }}</span>
+        </div>
+      </div>
+
+      <div class="mensaje mensaje-bot" *ngIf="cargando">
+        <div class="mensaje-contenido">
+          <div class="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sugerencias" *ngIf="sugerencias.length > 0 && !cargando">
+      <p class="sugerencias-titulo">Preguntas sugeridas:</p>
+      <button *ngFor="let sugerencia of sugerencias" 
+              class="sugerencia-btn"
+              (click)="usarSugerencia(sugerencia)">
+        {{ sugerencia }}
+      </button>
+    </div>
+
+    <div class="chat-input-container">
+      <input 
+        type="text" 
+        class="chat-input"
+        [(ngModel)]="mensajeInput"
+        (keypress)="onKeyPress($event)"
+        placeholder="Escribe tu mensaje..."
+        [disabled]="cargando">
+      <button 
+        class="send-btn"
+        (click)="enviarMensaje()"
+        [disabled]="!mensajeInput.trim() || cargando">
+        <span>➤</span>
+      </button>
+    </div>
+  </div>
+</div>

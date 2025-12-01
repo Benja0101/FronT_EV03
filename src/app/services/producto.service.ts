@@ -9,6 +9,30 @@ export interface Producto {
   codigo: string;
   stock: number;
   precio: number;
+  descripcion?: string;
+  
+  // ⭐ Campos de IA persistentes en backend
+  descripcion_corta?: string;
+  descripcion_larga?: string;
+  palabras_clave?: string;
+  beneficios?: string;  // JSON string
+  descripcion_generada_fecha?: string;
+}
+
+// Helper para parsear beneficios
+export function getBeneficiosArray(producto: Producto): string[] {
+  if (!producto.beneficios) return [];
+  try {
+    return JSON.parse(producto.beneficios);
+  } catch (e) {
+    return [];
+  }
+}
+
+// Helper para palabras clave
+export function getPalabrasClave(producto: Producto): string[] {
+  if (!producto.palabras_clave) return [];
+  return producto.palabras_clave.split(',').map(p => p.trim());
 }
 
 export interface PaginatedResponse<T> {

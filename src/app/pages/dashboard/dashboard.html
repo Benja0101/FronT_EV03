@@ -58,6 +58,55 @@
     </div>
   </div>
 
+  <!-- Widget de Estadísticas IA -->
+  <div class="ia-stats-widget" *ngIf="statsIA">
+    <div class="ia-header">
+      <div class="ia-icon">🤖</div>
+      <div>
+        <h3>Estado de la Inteligencia Artificial</h3>
+        <p class="ia-subtitle">Sistema de recomendaciones y asistente virtual</p>
+      </div>
+    </div>
+    
+    <div class="ia-stats-grid">
+      <div class="ia-stat">
+        <div class="ia-stat-icon">📦</div>
+        <div class="ia-stat-info">
+          <span class="ia-stat-label">Productos Totales</span>
+          <span class="ia-stat-value">{{ statsIA.productos.total }}</span>
+        </div>
+      </div>
+      
+      <div class="ia-stat">
+        <div class="ia-stat-icon">✅</div>
+        <div class="ia-stat-info">
+          <span class="ia-stat-label">Con Stock</span>
+          <span class="ia-stat-value">{{ statsIA.productos.con_stock }}</span>
+        </div>
+      </div>
+      
+      <div class="ia-stat">
+        <div class="ia-stat-icon">❌</div>
+        <div class="ia-stat-info">
+          <span class="ia-stat-label">Sin Stock</span>
+          <span class="ia-stat-value">{{ statsIA.productos.sin_stock }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="ia-message">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span>{{ statsIA.mensaje }}</span>
+    </div>
+  </div>
+
+  <div class="ia-stats-widget ia-loading" *ngIf="cargandoStatsIA">
+    <div class="loading-spinner"></div>
+    <p>Cargando estadísticas de IA...</p>
+  </div>
+
   <!-- Gráficos principales -->
   <div class="charts-grid">
     <!-- Gráfico de Ventas -->

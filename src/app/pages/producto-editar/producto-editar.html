@@ -43,11 +43,30 @@
         required>
     </div>
 
+    <div class="form-group">
+      <label>📝 Descripción</label>
+      <textarea 
+        [(ngModel)]="producto.descripcion" 
+        name="descripcion"
+        rows="4"
+        placeholder="Descripción del producto"
+        class="form-control">
+      </textarea>
+    </div>
+
     <div *ngIf="error" class="error-message">{{ error }}</div>
     <div *ngIf="success" class="success-message">{{ success }}</div>
 
     <div class="form-actions">
       <button type="button" class="btn-secondary" (click)="cancelar()">Cancelar</button>
+      <button 
+        type="button" 
+        class="btn-ia" 
+        (click)="generarDescripcionIA()"
+        [disabled]="cargandoDescripcion || !producto.id">
+        <span *ngIf="!cargandoDescripcion">🤖 Generar con IA</span>
+        <span *ngIf="cargandoDescripcion">Generando...</span>
+      </button>
       <button type="submit" class="btn-primary">Actualizar</button>
     </div>
   </form>

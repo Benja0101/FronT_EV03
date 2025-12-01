@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://heroic-transformation-production.up.railway.app/api/'
+  apiUrl: 'http://localhost:8000/api/'
 };

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Chart, registerables } from 'chart.js';
 import { VentaService } from '../../services/venta.service';
 import { ClienteService } from '../../services/cliente.service';
+import { IAService, StatsIA } from '../../services/ia.service';
 
 Chart.register(...registerables);
 
@@ -28,6 +29,10 @@ export class Dashboard implements OnInit, AfterViewInit {
   ventasHoy: number = 0;
   promedioVenta: number = 0;
   
+  // Estadísticas IA
+  statsIA: StatsIA | null = null;
+  cargandoStatsIA: boolean = false;
+  
   // Charts
   ventasChart: any;
   productosChart: any;
@@ -36,6 +41,7 @@ export class Dashboard implements OnInit, AfterViewInit {
   constructor(
     private ventaService: VentaService,
     private clienteService: ClienteService,
+    private iaService: IAService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -47,6 +53,7 @@ export class Dashboard implements OnInit, AfterViewInit {
     this.promedioVenta = 0;
     
     this.cargarDatos();
+    this.cargarStatsIA();
   }
 
   ngAfterViewInit(): void {
@@ -411,5 +418,22 @@ export class Dashboard implements OnInit, AfterViewInit {
     return Array.from(this.productosVendidos.values())
       .sort((a, b) => b.cantidad - a.cantidad)
       .slice(0, 5);
+  }
+
+  cargarStatsIA(): void {
+    this.cargandoStatsIA = true;
+    this.iaService.getEstadisticasIA().subscribe({
+      next: (data) => {
+        this.statsIA = data;
+        this.cargandoStatsIA = false;
+        this.cdr.detectChanges();
+        console.log('🤖 Stats IA cargadas:', data);
+      },
+      error: (err) => {
+        console.error('❌ Error cargando stats IA:', err);
+        this.cargandoStatsIA = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 }

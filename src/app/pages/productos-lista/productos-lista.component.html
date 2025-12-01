@@ -218,6 +218,48 @@
             placeholder="Precio del producto">
         </div>
 
+        <!-- ⭐ SECCIÓN DE DESCRIPCIÓN IA -->
+        <div class="ia-section">
+          <h4 class="ia-title">
+            <span class="ia-icon">🤖</span>
+            Descripción con IA
+          </h4>
+          
+          <button 
+            type="button"
+            class="btn-ia"
+            (click)="generarDescripcionIA()"
+            [disabled]="cargandoDescripcion || !productoEditando.id">
+            <span *ngIf="!cargandoDescripcion">✨ Generar con IA</span>
+            <span *ngIf="cargandoDescripcion">
+              <span class="spinner-ia"></span> Generando...
+            </span>
+          </button>
+
+          <!-- Mostrar si ya tiene descripción -->
+          <div class="descripcion-preview" *ngIf="productoEditando.descripcion_corta">
+            <div class="preview-header">
+              <span class="badge-guardado">✓ Guardada en BD</span>
+              <span class="fecha" *ngIf="productoEditando.descripcion_generada_fecha">
+                {{ productoEditando.descripcion_generada_fecha | date:'dd/MM/yyyy HH:mm' }}
+              </span>
+            </div>
+            
+            <div class="descripcion-content">
+              <h5>Descripción Corta:</h5>
+              <p>{{ productoEditando.descripcion_corta }}</p>
+              
+              <h5>Descripción Larga:</h5>
+              <p class="truncate">{{ productoEditando.descripcion_larga }}</p>
+            </div>
+          </div>
+
+          <!-- Mensaje si no tiene descripción -->
+          <div class="sin-descripcion" *ngIf="!productoEditando.descripcion_corta && productoEditando.id">
+            <p class="hint">Este producto aún no tiene descripción generada por IA</p>
+          </div>
+        </div>
+
         <div *ngIf="error" class="error-message">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>

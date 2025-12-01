@@ -41,12 +41,14 @@
     </div>
 
     <div class="sugerencias" *ngIf="sugerencias.length > 0 && !cargando">
-      <p class="sugerencias-titulo">Preguntas sugeridas:</p>
-      <button *ngFor="let sugerencia of sugerencias" 
-              class="sugerencia-btn"
-              (click)="usarSugerencia(sugerencia)">
-        {{ sugerencia }}
-      </button>
+      <p class="sugerencias-titulo">💡 Preguntas sugeridas</p>
+      <div class="sugerencias-chips">
+        <button *ngFor="let sugerencia of sugerencias" 
+                class="sugerencia-chip"
+                (click)="usarSugerencia(sugerencia)">
+          {{ sugerencia }}
+        </button>
+      </div>
     </div>
 
     <div class="chat-input-container">

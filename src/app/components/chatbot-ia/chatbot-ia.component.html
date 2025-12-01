@@ -1,70 +1,60 @@
 <div class="chatbot-container">
-  <!-- Botón flotante para abrir/cerrar chat -->
+  
+  <!-- Botón flotante -->
   <button class="chat-toggle-btn" (click)="toggleChat()" [class.chat-open]="chatAbierto">
     <span *ngIf="!chatAbierto">💬</span>
     <span *ngIf="chatAbierto">✕</span>
   </button>
 
-  <!-- Ventana de chat -->
+  <!-- Ventana -->
   <div class="chat-window" [class.open]="chatAbierto">
+
+    <!-- Header -->
     <div class="chat-header">
       <div class="header-content">
         <span class="bot-icon">🤖</span>
         <div class="header-text">
           <h3>Asistente Virtual</h3>
-          <p class="status">En línea</p>
+          <p class="status">Disponible</p>
         </div>
       </div>
       <button class="close-btn" (click)="toggleChat()">✕</button>
     </div>
 
+    <!-- Mensajes -->
     <div class="chat-mensajes">
-      <div *ngFor="let mensaje of mensajes" 
-           class="mensaje"
+      <div *ngFor="let mensaje of mensajes"
+           [class.mensaje-bot]="mensaje.tipo === 'bot'"
            [class.mensaje-usuario]="mensaje.tipo === 'usuario'"
-           [class.mensaje-bot]="mensaje.tipo === 'bot'">
-        <div class="mensaje-contenido">
-          <p>{{ mensaje.contenido }}</p>
-          <span class="timestamp">{{ mensaje.timestamp | date:'HH:mm' }}</span>
-        </div>
+           class="mensaje">
+        <p>{{ mensaje.contenido }}</p>
+        <span class="timestamp">{{ mensaje.timestamp | date:'HH:mm' }}</span>
       </div>
 
-      <div class="mensaje mensaje-bot" *ngIf="cargando">
-        <div class="mensaje-contenido">
-          <div class="typing-indicator">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
+      <!-- Indicador typing -->
+      <div *ngIf="cargando" class="mensaje mensaje-bot">
+        <div class="typing-indicator">
+          <span></span><span></span><span></span>
         </div>
       </div>
     </div>
 
-    <div class="sugerencias" *ngIf="sugerencias.length > 0 && !cargando">
-      <p class="sugerencias-titulo">💡 Preguntas sugeridas</p>
-      <div class="sugerencias-chips">
-        <button *ngFor="let sugerencia of sugerencias" 
-                class="sugerencia-chip"
-                (click)="usarSugerencia(sugerencia)">
-          {{ sugerencia }}
-        </button>
-      </div>
-    </div>
-
+    <!-- Input -->
     <div class="chat-input-container">
       <input 
-        type="text" 
         class="chat-input"
         [(ngModel)]="mensajeInput"
         (keypress)="onKeyPress($event)"
         placeholder="Escribe tu mensaje..."
-        [disabled]="cargando">
-      <button 
-        class="send-btn"
-        (click)="enviarMensaje()"
-        [disabled]="!mensajeInput.trim() || cargando">
-        <span>➤</span>
+        [disabled]="cargando"
+      >
+
+      <button class="send-btn"
+              (click)="enviarMensaje()"
+              [disabled]="!mensajeInput.trim() || cargando">
+        ➤
       </button>
     </div>
+
   </div>
 </div>

@@ -11,6 +11,10 @@ export interface Producto {
   precio: number;
   descripcion?: string;
   
+  // 📸 Campos de imagen
+  foto?: string;  // Base64 para enviar al backend
+  foto_url?: string;  // Base64 que retorna el backend (listo para <img src="">)
+  
   // ⭐ Campos de IA persistentes en backend
   descripcion_corta?: string;
   descripcion_larga?: string;

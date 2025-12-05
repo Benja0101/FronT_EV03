@@ -43,6 +43,47 @@
         required>
     </div>
 
+    <!-- 📸 Sección de Imagen del Producto -->
+    <div class="form-group">
+      <label>📸 Imagen del Producto</label>
+
+      <!-- Selector de archivo -->
+      <div class="image-upload-container" *ngIf="!imagenPreview">
+        <input 
+          type="file" 
+          id="fileInputEdit"
+          (change)="onFileSelected($event)"
+          accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/bmp"
+          class="file-input"
+          #fileInput>
+        <label for="fileInputEdit" class="file-label">
+          📤 Seleccionar imagen
+          <small>JPG, PNG, GIF, WEBP, BMP (Max. 5MB)</small>
+        </label>
+      </div>
+
+      <!-- Preview de la imagen -->
+      <div class="image-preview-container" *ngIf="imagenPreview">
+        <div class="image-preview">
+          <img [src]="imagenPreview" [alt]="producto.nombre || 'Preview'">
+          <button type="button" class="btn-delete-image" (click)="eliminarImagen()">🗑️</button>
+        </div>
+        <div class="image-info" *ngIf="archivoSeleccionado">
+          <span class="image-name">📎 {{ getNombreArchivo() }}</span>
+          <span class="image-size">{{ getTamanioArchivo() }}</span>
+        </div>
+      </div>
+
+      <!-- Loading state -->
+      <div class="loading-image" *ngIf="cargandoImagen">
+        <div class="spinner"></div>
+        <span>Procesando imagen...</span>
+      </div>
+
+      <!-- Error de imagen -->
+      <div *ngIf="errorImagen" class="error-message">{{ errorImagen }}</div>
+    </div>
+
     <div class="form-group">
       <label>📝 Descripción</label>
       <textarea 

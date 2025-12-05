@@ -113,6 +113,75 @@
           </div>
         </div>
 
+        <!-- 📸 Sección de Imagen del Producto -->
+        <div class="form-group form-group-full">
+          <label>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            Imagen del Producto
+          </label>
+
+          <!-- Selector de archivo -->
+          <div class="image-upload-container" *ngIf="!imagenPreview">
+            <input 
+              type="file" 
+              id="fileInput"
+              (change)="onFileSelected($event)"
+              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/bmp"
+              class="file-input"
+              #fileInput>
+            <label for="fileInput" class="file-label">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <span>Seleccionar imagen</span>
+              <small>JPG, PNG, GIF, WEBP, BMP (Max. 5MB)</small>
+            </label>
+          </div>
+
+          <!-- Preview de la imagen -->
+          <div class="image-preview-container" *ngIf="imagenPreview">
+            <div class="image-preview">
+              <img [src]="imagenPreview" [alt]="producto.nombre || 'Preview'">
+              <div class="image-overlay">
+                <button type="button" class="btn-delete-image" (click)="eliminarImagen()" title="Eliminar imagen">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="image-info">
+              <span class="image-name">📎 {{ getNombreArchivo() }}</span>
+              <span class="image-size">{{ getTamanioArchivo() }}</span>
+            </div>
+          </div>
+
+          <!-- Loading state -->
+          <div class="loading-image" *ngIf="cargandoImagen">
+            <div class="spinner"></div>
+            <span>Procesando imagen...</span>
+          </div>
+
+          <!-- Error de imagen -->
+          <div *ngIf="errorImagen" class="error-message-inline">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>{{ errorImagen }}</span>
+          </div>
+        </div>
+
         <!-- Campo de Descripción -->
         <div class="form-group form-group-full">
           <label>

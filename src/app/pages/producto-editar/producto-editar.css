@@ -51,6 +51,23 @@ input:disabled, textarea:disabled {
   cursor: not-allowed;
 }
 
+/* Campo readonly con estilo especial */
+.readonly-input {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%) !important;
+  border: 2px dashed #667eea !important;
+  color: #667eea !important;
+  font-weight: 600 !important;
+  cursor: not-allowed !important;
+}
+
+.form-text.text-muted {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #667eea;
+  font-style: italic;
+}
+
 input:focus:not(:disabled), textarea:focus:not(:disabled) {
   outline: none;
   border-color: #667eea;

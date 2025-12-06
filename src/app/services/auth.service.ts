@@ -22,32 +22,18 @@ export class AuthService {
 
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
-  constructor(private http: HttpClient) {
-    // AuthService inicializado
-  }
+  constructor(private http: HttpClient) {}
 
   private hasToken(): boolean {
     return !!localStorage.getItem('access_token');
   }
 
   login(credentials: LoginRequest): Observable<TokenResponse> {
-    console.log('🔵 Intentando login a:', `${this.apiUrl}token/`);
-    console.log('📝 Credenciales:', credentials);
-    
     return this.http.post<TokenResponse>(`${this.apiUrl}token/`, credentials)
       .pipe(
         tap(response => {
-          console.log('✅ Respuesta del servidor:', response);
-          console.log('🔑 Access Token recibido:', response.access?.substring(0, 20) + '...');
-          console.log('🔑 Refresh Token recibido:', response.refresh?.substring(0, 20) + '...');
-          
           localStorage.setItem('access_token', response.access);
           localStorage.setItem('refresh_token', response.refresh);
-          
-          console.log('💾 Token guardado en localStorage');
-          console.log('💾 Access Token guardado:', localStorage.getItem('access_token')?.substring(0, 20) + '...');
-          console.log('💾 Refresh Token guardado:', localStorage.getItem('refresh_token')?.substring(0, 20) + '...');
-          
           this.isAuthenticatedSubject.next(true);
         })
       );

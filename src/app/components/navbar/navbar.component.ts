@@ -33,9 +33,7 @@ export class NavbarComponent {
   }
 
   logout(): void {
-    console.log('🚪 Cerrando sesión...');
     this.authService.logout();
     this.router.navigate(['/login']);
-    console.log('✅ Sesión cerrada, redirigiendo a login');
   }
 }

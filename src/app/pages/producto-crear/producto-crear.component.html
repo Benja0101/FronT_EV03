@@ -26,6 +26,19 @@
     <!-- Formulario -->
     <div class="form-card">
       <form (ngSubmit)="crear()">
+        <!-- Mensaje informativo sobre código automático -->
+        <div class="info-message">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+          <div>
+            <strong>🤖 Código Automático</strong>
+            <p>El código del producto se generará automáticamente al guardar</p>
+          </div>
+        </div>
+
         <div class="form-grid">
           <div class="form-group">
             <label>
@@ -41,26 +54,6 @@
                 name="nombre"
                 type="text" 
                 placeholder="Nombre del producto"
-                required
-                class="styled-input">
-              <div class="input-line"></div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-              </svg>
-              Código *
-            </label>
-            <div class="input-wrapper">
-              <input 
-                [(ngModel)]="producto.codigo" 
-                name="codigo"
-                type="text" 
-                placeholder="Código único del producto"
                 required
                 class="styled-input">
               <div class="input-line"></div>
@@ -187,7 +180,14 @@
           <label>
             📝 Descripción (Generada con IA)
           </label>
-          <div class="input-wrapper">
+          
+          <!-- Indicador de carga mientras se genera -->
+          <div class="loading-descripcion" *ngIf="cargandoDescripcion">
+            <div class="spinner"></div>
+            <span>✨ Generando descripción con inteligencia artificial...</span>
+          </div>
+          
+          <div class="input-wrapper" *ngIf="!cargandoDescripcion">
             <textarea 
               [(ngModel)]="producto.descripcion" 
               name="descripcion"
@@ -197,6 +197,7 @@
             </textarea>
             <div class="input-line"></div>
           </div>
+          
         </div>
 
         <div *ngIf="error" class="error-message">
@@ -228,9 +229,9 @@
             type="button" 
             class="btn-ia" 
             (click)="generarDescripcionIA()"
-            [disabled]="cargandoDescripcion || !producto.nombre || !producto.codigo">
+            [disabled]="cargandoDescripcion || !producto.nombre || !producto.precio || producto.stock === undefined">
             <span *ngIf="!cargandoDescripcion">🤖 Generar con IA</span>
-            <span *ngIf="cargandoDescripcion">Generando...</span>
+            <span *ngIf="cargandoDescripcion">✨ Generando...</span>
           </button>
           <button type="submit" class="btn-primary">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -238,7 +239,8 @@
               <polyline points="17 21 17 13 7 13 7 21"></polyline>
               <polyline points="7 3 7 8 15 8"></polyline>
             </svg>
-            <span>Guardar Producto</span>
+            <span *ngIf="!producto.id">Guardar Producto</span>
+            <span *ngIf="producto.id">✅ Finalizar y Guardar</span>
           </button>
         </div>
       </form>

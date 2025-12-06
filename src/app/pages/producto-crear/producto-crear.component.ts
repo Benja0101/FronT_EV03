@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -12,9 +12,10 @@ import { IAService, DescripcionProducto } from '../../services/ia.service';
   styleUrls: ['./producto-crear.component.css']
 })
 export class ProductoCrearComponent {
+  private cdr = inject(ChangeDetectorRef);
   producto: Producto = {
     nombre: '',
-    codigo: '',
+    codigo: '', // Se mantendrá vacío, el backend lo genera automáticamente
     stock: 0,
     precio: 0,
     descripcion: ''
@@ -44,15 +45,49 @@ export class ProductoCrearComponent {
     this.success = '';
     this.errorImagen = '';
 
+    // Si el producto ya tiene ID, significa que ya fue creado (por la IA)
+    // En ese caso, solo actualizar los campos faltantes y redirigir
+    if (this.producto.id) {
+      // Preparar datos para actualización
+      const productoActualizado: any = {
+        nombre: this.producto.nombre,
+        codigo: this.producto.codigo,
+        stock: Number(this.producto.stock),
+        precio: Number(this.producto.precio)
+      };
+
+      if (this.producto.descripcion && this.producto.descripcion.trim()) {
+        productoActualizado.descripcion = this.producto.descripcion;
+      }
+
+      if (this.producto.foto) {
+        productoActualizado.foto = this.producto.foto;
+      }
+
+      this.productoService.updateProducto(this.producto.codigo, productoActualizado).subscribe({
+        next: (response) => {
+          this.success = 'Producto guardado exitosamente';
+          setTimeout(() => {
+            this.router.navigate(['/admin/productos']);
+          }, 1500);
+        },
+        error: (err) => {
+          this.manejarErrorBackend(err);
+        }
+      });
+      return;
+    }
+
+    // Si no tiene ID, crear nuevo producto
     // Si hay imagen, validar antes de enviar
     if (this.archivoSeleccionado && !this.validarImagen()) {
       return;
     }
 
-    // 🧹 Limpiar el objeto: eliminar campos vacíos y undefined
+    // 🧹 Preparar objeto SIN código (el backend lo genera automáticamente)
     const productoLimpio: any = {
       nombre: this.producto.nombre,
-      codigo: this.producto.codigo,
+      // codigo NO se envía - se genera automáticamente en el backend
       stock: Number(this.producto.stock),
       precio: Number(this.producto.precio)
     };
@@ -67,59 +102,50 @@ export class ProductoCrearComponent {
       productoLimpio.foto = this.producto.foto;
     }
 
-    // 🔍 DEBUG: Ver qué se está enviando
-    console.log('📤 Enviando producto:', {
-      ...productoLimpio,
-      foto: productoLimpio.foto ? `Base64 (${(productoLimpio.foto.length / 1024).toFixed(2)}KB)` : 'Sin imagen'
-    });
-
     this.productoService.createProducto(productoLimpio).subscribe({
       next: (response) => {
-        console.log('✅ Producto creado', response);
+        this.producto = response; // Guardar el producto creado con su ID
         this.success = 'Producto creado exitosamente';
         setTimeout(() => {
           this.router.navigate(['/admin/productos']);
         }, 1500);
       },
       error: (err) => {
-        console.error('❌ Error completo:', err);
-        console.error('📋 Error del backend:', err.error);
-        console.error('🔍 Detalle del error de codigo:', err.error?.codigo);
-        
-        if (err.error) {
-          // Mostrar errores específicos del backend
-          if (typeof err.error === 'object') {
-            const errores = Object.keys(err.error).map(k => {
-              const valor = Array.isArray(err.error[k]) ? err.error[k].join(', ') : err.error[k];
-              
-              // Mensajes más amigables
-              if (k === 'codigo' && valor.toLowerCase().includes('unique')) {
-                return `⚠️ El código "${this.producto.codigo}" ya existe. Usa otro código.`;
-              }
-              if (k === 'codigo' && valor.toLowerCase().includes('already exists')) {
-                return `⚠️ El código "${this.producto.codigo}" ya existe. Usa otro código.`;
-              }
-              if (k === 'codigo' && valor.toLowerCase().includes('duplicate')) {
-                return `⚠️ El código "${this.producto.codigo}" está duplicado. Usa otro código.`;
-              }
-              if (k === 'foto' && valor.includes('corrupta')) {
-                return `⚠️ Imagen corrupta o inválida`;
-              }
-              if (k === 'foto' && valor.includes('grande')) {
-                return `⚠️ Imagen muy grande (máximo 5MB)`;
-              }
-              
-              return `${k}: ${valor}`;
-            });
-            this.error = errores.join(' | ');
-          } else {
-            this.error = err.error;
-          }
-        } else {
-          this.error = 'Error al crear el producto';
-        }
+        this.manejarErrorBackend(err);
       }
     });
+  }
+
+  private manejarErrorBackend(err: any) {
+    
+    if (err.error) {
+      // Mostrar errores específicos del backend
+      if (typeof err.error === 'object') {
+        const errores = Object.keys(err.error).map(k => {
+          const valor = Array.isArray(err.error[k]) ? err.error[k].join(', ') : err.error[k];
+          
+          // Mensajes más amigables
+          if (k === 'codigo' && (valor.toLowerCase().includes('unique') || 
+                                  valor.toLowerCase().includes('already exists') || 
+                                  valor.toLowerCase().includes('duplicate'))) {
+            return `⚠️ El código "${this.producto.codigo}" ya existe. Usa otro código.`;
+          }
+          if (k === 'foto' && valor.includes('corrupta')) {
+            return `⚠️ Imagen corrupta o inválida`;
+          }
+          if (k === 'foto' && valor.includes('grande')) {
+            return `⚠️ Imagen muy grande (máximo 5MB)`;
+          }
+          
+          return `${k}: ${valor}`;
+        });
+        this.error = errores.join(' | ');
+      } else {
+        this.error = err.error;
+      }
+    } else {
+      this.error = 'Error al procesar el producto';
+    }
   }
 
   cancelar() {
@@ -127,59 +153,96 @@ export class ProductoCrearComponent {
   }
 
   generarDescripcionIA() {
-    if (!this.producto.nombre || !this.producto.codigo) {
-      this.error = 'Completa al menos el nombre y código del producto';
+    // Validar que todos los campos requeridos estén completos (SIN código)
+    if (!this.producto.nombre || !this.producto.precio || this.producto.stock === undefined) {
+      this.error = '⚠️ Completa todos los campos requeridos (nombre, stock y precio) antes de generar la descripción con IA';
       return;
     }
 
     this.cargandoDescripcion = true;
     this.error = '';
+    this.success = '';
 
-    // Primero crear el producto si no existe
-    if (!this.producto.id) {
-      this.productoService.createProducto(this.producto).subscribe({
+    // Verificar si el producto YA fue creado (tiene ID y código)
+    if (!this.producto.id || !this.producto.codigo) {
+      console.log('🆕 Producto no existe, creando primero...');
+      // Preparar producto completo SIN código (se genera automáticamente)
+      const productoCompleto: any = {
+        nombre: this.producto.nombre,
+        // codigo NO se envía - se genera automáticamente
+        stock: Number(this.producto.stock),
+        precio: Number(this.producto.precio)
+      };
+
+      // Agregar foto si existe
+      if (this.producto.foto) {
+        productoCompleto.foto = this.producto.foto;
+      }
+
+      this.productoService.createProducto(productoCompleto).subscribe({
         next: (response) => {
-          this.producto = response;
+          console.log('✅ Producto creado:', response);
+          this.producto = response; // Guardar el producto completo con ID y código generado
+          this.cdr.detectChanges(); // Forzar actualización de la UI
+          
+          // Ahora sí generar la descripción
           this.generarYGuardarDescripcion();
         },
         error: (err) => {
-          console.error('Error al crear producto:', err);
-          this.error = '❌ Error al crear el producto';
+          console.error('❌ Error al crear producto:', err);
+          this.manejarErrorBackend(err);
           this.cargandoDescripcion = false;
+          this.cdr.detectChanges();
         }
       });
     } else {
+      // El producto YA existe, solo generar descripción
+      console.log('✅ Producto ya existe (ID: ' + this.producto.id + '), generando descripción...');
       this.generarYGuardarDescripcion();
     }
   }
 
   generarYGuardarDescripcion() {
-    if (!this.producto.id) return;
+    if (!this.producto.id) {
+      this.error = '❌ Error: El producto debe tener un ID';
+      this.cargandoDescripcion = false;
+      this.cdr.detectChanges();
+      return;
+    }
 
     this.iaService.generarDescripcion(this.producto.id).subscribe({
       next: (data: DescripcionProducto) => {
-        console.log('Descripción generada:', data);
+        console.log('✅ Respuesta de la IA:', data);
         
-        // Actualizar el producto con la descripción generada
+        // ✅ El backend YA GUARDÓ la descripción automáticamente
+        // Solo necesitamos actualizar el objeto local con los datos recibidos
         this.producto.descripcion = data.descripcion_larga;
         
-        // Guardar en la BD
-        this.productoService.updateProducto(this.producto.codigo, this.producto).subscribe({
-          next: () => {
-            this.success = '✅ Descripción generada y guardada con IA exitosamente';
-            this.cargandoDescripcion = false;
-          },
-          error: (err) => {
-            console.error('Error al guardar descripción:', err);
-            this.error = '❌ Error al guardar la descripción';
-            this.cargandoDescripcion = false;
-          }
-        });
+        // Mostrar en consola para debug
+        console.log('📝 Descripción larga asignada:', this.producto.descripcion);
+        console.log('📝 Descripción corta:', data.descripcion_corta);
+        console.log('🔑 Palabras clave:', data.palabras_clave);
+        console.log('✨ Beneficios:', data.beneficios);
+        
+        this.success = '✅ Descripción generada exitosamente con IA';
+        this.cargandoDescripcion = false;
+        
+        // Forzar detección de cambios para actualizar la UI inmediatamente
+        this.cdr.detectChanges();
+        
+        console.log('🔄 UI actualizada, cargandoDescripcion:', this.cargandoDescripcion);
       },
       error: (err) => {
-        console.error('Error al generar descripción:', err);
-        this.error = '❌ Error al generar descripción con IA';
+        console.error('❌ Error al generar descripción:', err);
+        if (err.error?.detail) {
+          this.error = `❌ ${err.error.detail}`;
+        } else if (err.error?.error) {
+          this.error = `❌ ${err.error.error}`;
+        } else {
+          this.error = '❌ Error al generar descripción con IA';
+        }
         this.cargandoDescripcion = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -235,13 +298,14 @@ export class ProductoCrearComponent {
       this.producto.foto = base64;
       
       this.cargandoImagen = false;
-      console.log('✅ Imagen convertida a base64');
+      this.cdr.detectChanges(); // Forzar actualización de la UI
     };
 
     reader.onerror = () => {
       this.errorImagen = 'Error al leer el archivo';
       this.limpiarImagen();
       this.cargandoImagen = false;
+      this.cdr.detectChanges();
     };
 
     reader.readAsDataURL(file);

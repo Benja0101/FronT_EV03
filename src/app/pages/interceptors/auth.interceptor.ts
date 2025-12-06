@@ -58,13 +58,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       Authorization: `Bearer ${token}`
     }
   });
-  console.log('✅ Request con Authorization header');
   
   return next(clonedRequest).pipe(
     catchError((error: HttpErrorResponse) => {
-      console.error('❌ Error en request:', error);
-      console.error('Status:', error.status);
-      console.error('Message:', error.message);
+      console.error('❌ Error HTTP:', {
+        url: error.url,
+        status: error.status,
+        message: error.message,
+        error: error.error
+      });
       
       // Si es error 401, intentar refrescar el token
       if (error.status === 401 && !req.url.includes('/token/refresh/')) {

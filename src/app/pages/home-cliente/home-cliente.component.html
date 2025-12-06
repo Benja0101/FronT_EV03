@@ -199,13 +199,23 @@
 
     <div class="productos-grid" *ngIf="productos.length > 0">
       <div class="producto-card" *ngFor="let producto of productos; let i = index" [style.animation-delay.s]="i * 0.1">
-        <div class="producto-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
-            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
-            <line x1="6" y1="6" x2="6.01" y2="6"></line>
-            <line x1="6" y1="18" x2="6.01" y2="18"></line>
-          </svg>
+        
+        <!-- 📸 Imagen del producto -->
+        <div class="producto-imagen-container">
+          <img 
+            *ngIf="producto.foto_url" 
+            [src]="producto.foto_url" 
+            [alt]="producto.nombre"
+            class="producto-imagen"
+            loading="lazy">
+          <div *ngIf="!producto.foto_url" class="producto-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+              <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+              <line x1="6" y1="6" x2="6.01" y2="6"></line>
+              <line x1="6" y1="18" x2="6.01" y2="18"></line>
+            </svg>
+          </div>
         </div>
 
         <div class="producto-info">
@@ -220,7 +230,7 @@
           <!-- Descripción corta IA si existe -->
           <div class="descripcion-corta" *ngIf="producto.descripcion_corta">
             <p>{{ producto.descripcion_corta }}</p>
-            <span class="badge-ia">🤖 Con IA</span>
+            <span class="badge-ia">🤖 IA</span>
           </div>
 
           <div class="precio">
@@ -240,7 +250,7 @@
                 <line x1="12" y1="16" x2="12" y2="12"></line>
                 <line x1="12" y1="8" x2="12.01" y2="8"></line>
               </svg>
-              Ver Detalles
+              Detalles
             </button>
             <button 
               class="btn-add-cart" 
@@ -258,7 +268,7 @@
       </div>
     </div>
 
-    <div class="empty-state" *ngIf="productos.length === 0">
+    <div class="empty-state" *ngIf="productos.length === 0 && !cargando">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
         <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
@@ -266,6 +276,52 @@
         <line x1="6" y1="18" x2="6.01" y2="18"></line>
       </svg>
       <p>No hay productos disponibles</p>
+    </div>
+    
+    <!-- 📄 Paginación -->
+    <div class="paginacion-container" *ngIf="totalPaginas > 1 && !cargando">
+      <div class="paginacion">
+        <button 
+          class="btn-paginacion btn-anterior" 
+          (click)="paginaAnterior()"
+          [disabled]="paginaActual === 1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          <span>Anterior</span>
+        </button>
+
+        <div class="numeros-pagina">
+          <button 
+            *ngFor="let pagina of obtenerPaginas()"
+            [class.numero-pagina]="pagina !== '...'"
+            [class.puntos-suspension]="pagina === '...'"
+            [class.activa]="pagina === paginaActual"
+            [disabled]="pagina === '...'"
+            (click)="pagina !== '...' && irAPagina(+pagina)">
+            {{ pagina }}
+          </button>
+        </div>
+
+        <button 
+          class="btn-paginacion btn-siguiente" 
+          (click)="paginaSiguiente()"
+          [disabled]="paginaActual === totalPaginas">
+          <span>Siguiente</span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+      
+      <div class="info-paginacion">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <span>Mostrando página <strong>{{ paginaActual }}</strong> de <strong>{{ totalPaginas }}</strong> ({{ totalProductos }} productos en total)</span>
+      </div>
     </div>
     </section>
   </div>
@@ -281,13 +337,22 @@
       </button>
 
       <div class="modal-detalle-header">
-        <div class="producto-icon-large">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
-            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
-            <line x1="6" y1="6" x2="6.01" y2="6"></line>
-            <line x1="6" y1="18" x2="6.01" y2="18"></line>
-          </svg>
+        <!-- 📸 Imagen del producto en modal -->
+        <div class="producto-imagen-modal-container">
+          <img 
+            *ngIf="productoSeleccionado?.foto_url" 
+            [src]="productoSeleccionado?.foto_url" 
+            [alt]="productoSeleccionado?.nombre || 'Producto'"
+            class="producto-imagen-modal"
+            loading="lazy">
+          <div *ngIf="!productoSeleccionado?.foto_url" class="producto-icon-large">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+              <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+              <line x1="6" y1="6" x2="6.01" y2="6"></line>
+              <line x1="6" y1="18" x2="6.01" y2="18"></line>
+            </svg>
+          </div>
         </div>
         <h2>{{ productoSeleccionado?.nombre }}</h2>
         <div class="modal-meta">

@@ -25,6 +25,13 @@ export class HomeClienteComponent implements OnInit {
   productoSeleccionado: Producto | null = null;
   beneficiosProducto: string[] = [];
   palabrasClaveProducto: string[] = [];
+  
+  // 📄 Paginación
+  paginaActual: number = 1;
+  totalPaginas: number = 1;
+  totalProductos: number = 0;
+  productosPorPagina: number = 9;
+  cargando: boolean = false;
 
   constructor(
     private productoService: ProductoService,
@@ -53,18 +60,20 @@ export class HomeClienteComponent implements OnInit {
   }
 
   cargarProductos() {
+    this.cargando = true;
     this.productos = []; // Limpiar array antes de cargar
-    this.productoService.getAllProductos().subscribe({
+    this.productoService.getProductos(this.paginaActual).subscribe({
       next: (data: any) => {
         this.productos = data.results || [];
+        this.totalProductos = data.count || 0;
+        this.totalPaginas = Math.ceil(this.totalProductos / this.productosPorPagina);
+        this.cargando = false;
         this.cdr.detectChanges(); // Forzar detección de cambios
       },
       error: (err: any) => {
-        console.error('❌ HomeCliente - Error al cargar productos:', err);
-        console.error('Status:', err.status);
-        console.error('Message:', err.message);
         this.error = 'Error al cargar los productos';
-        this.cdr.detectChanges(); // Forzar detección de cambios también en error
+        this.cargando = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -131,5 +140,61 @@ export class HomeClienteComponent implements OnInit {
       this.success = mensaje;
       setTimeout(() => this.success = '', 3000);
     }
+  }
+  
+  // 📄 Métodos de paginación
+  irAPagina(pagina: number) {
+    if (pagina < 1 || pagina > this.totalPaginas || pagina === this.paginaActual) {
+      return;
+    }
+    this.paginaActual = pagina;
+    this.cargarProductos();
+    this.scrollToProductos();
+  }
+
+  paginaSiguiente() {
+    if (this.paginaActual < this.totalPaginas) {
+      this.irAPagina(this.paginaActual + 1);
+    }
+  }
+
+  paginaAnterior() {
+    if (this.paginaActual > 1) {
+      this.irAPagina(this.paginaActual - 1);
+    }
+  }
+
+  obtenerPaginas(): (number | string)[] {
+    const paginas: (number | string)[] = [];
+    const maxPaginas = 5;
+
+    if (this.totalPaginas <= maxPaginas + 2) {
+      for (let i = 1; i <= this.totalPaginas; i++) {
+        paginas.push(i);
+      }
+    } else {
+      paginas.push(1);
+
+      if (this.paginaActual > 3) {
+        paginas.push('...');
+      }
+
+      const inicio = Math.max(2, this.paginaActual - 1);
+      const fin = Math.min(this.totalPaginas - 1, this.paginaActual + 1);
+
+      for (let i = inicio; i <= fin; i++) {
+        paginas.push(i);
+      }
+
+      if (this.paginaActual < this.totalPaginas - 2) {
+        paginas.push('...');
+      }
+
+      if (this.totalPaginas > 1) {
+        paginas.push(this.totalPaginas);
+      }
+    }
+
+    return paginas;
   }
 }

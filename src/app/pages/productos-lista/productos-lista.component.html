@@ -135,6 +135,81 @@
       </div>
     </div>
 
+    <!-- 📄 Controles de Paginación -->
+    <div class="paginacion-container" *ngIf="!loading && productos.length > 0 && totalPaginas > 1">
+      <div class="paginacion">
+        
+        <!-- Botón Anterior -->
+        <button 
+          class="btn-paginacion btn-anterior" 
+          (click)="paginaAnterior()" 
+          [disabled]="!anteriorUrl"
+          [class.disabled]="!anteriorUrl">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          <span>Anterior</span>
+        </button>
+        
+        <!-- Números de página -->
+        <div class="numeros-pagina">
+          <!-- Primera página si no está visible -->
+          <button 
+            *ngIf="getPaginasVisibles()[0] > 1"
+            (click)="irAPagina(1)"
+            class="numero-pagina">
+            1
+          </button>
+          <span *ngIf="getPaginasVisibles()[0] > 2" class="puntos-suspension">...</span>
+          
+          <!-- Páginas visibles -->
+          <button 
+            *ngFor="let pagina of getPaginasVisibles()"
+            (click)="irAPagina(pagina)"
+            [class.activa]="paginaActual === pagina"
+            class="numero-pagina">
+            {{ pagina }}
+          </button>
+          
+          <!-- Última página si no está visible -->
+          <span *ngIf="getPaginasVisibles()[getPaginasVisibles().length - 1] < totalPaginas - 1" class="puntos-suspension">...</span>
+          <button 
+            *ngIf="getPaginasVisibles()[getPaginasVisibles().length - 1] < totalPaginas"
+            (click)="irAPagina(totalPaginas)"
+            class="numero-pagina">
+            {{ totalPaginas }}
+          </button>
+        </div>
+        
+        <!-- Botón Siguiente -->
+        <button 
+          class="btn-paginacion btn-siguiente" 
+          (click)="paginaSiguiente()" 
+          [disabled]="!siguienteUrl"
+          [class.disabled]="!siguienteUrl">
+          <span>Siguiente</span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+        
+      </div>
+      
+      <!-- Info de paginación -->
+      <div class="info-paginacion">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <span>
+          Mostrando <strong>{{ getRangoProductos().inicio }}</strong> - 
+          <strong>{{ getRangoProductos().fin }}</strong> de 
+          <strong>{{ totalProductos }}</strong> productos
+        </span>
+      </div>
+    </div>
+
     <!-- Empty state -->
     <div *ngIf="!loading && productos.length === 0" class="empty-state">
       <div class="empty-icon">
@@ -182,10 +257,12 @@
           </label>
           <input 
             type="text" 
-            class="styled-input" 
+            class="styled-input readonly-input" 
             [(ngModel)]="productoEditando.codigo" 
             disabled
+            readonly
             placeholder="Código del producto">
+          <small class="form-hint">🤖 Generado automáticamente (no editable)</small>
         </div>
 
         <div class="form-group">
@@ -234,6 +311,82 @@
             min="0"
             step="0.01"
             placeholder="Precio del producto">
+        </div>
+
+        <!-- 📸 SECCIÓN DE IMAGEN -->
+        <div class="form-group form-group-full">
+          <label>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            Imagen del Producto
+          </label>
+
+          <!-- Selector de archivo si no hay preview -->
+          <div class="image-upload-container" *ngIf="!imagenPreview">
+            <input 
+              type="file" 
+              id="fileInputModal"
+              (change)="onFileSelected($event)"
+              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/bmp"
+              class="file-input"
+              #fileInputModal>
+            <label for="fileInputModal" class="file-label">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <span>Seleccionar imagen</span>
+              <small>JPG, PNG, GIF, WEBP, BMP (Max. 5MB)</small>
+            </label>
+          </div>
+
+          <!-- Preview de la imagen -->
+          <div class="image-preview-container" *ngIf="imagenPreview">
+            <div class="image-preview">
+              <img [src]="imagenPreview" [alt]="productoEditando.nombre || 'Preview'">
+              <div class="image-overlay">
+                <button type="button" class="btn-delete-image" (click)="eliminarImagen()" title="Eliminar imagen">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                  </svg>
+                </button>
+                <button type="button" class="btn-change-image" (click)="fileInputModal.nativeElement.click()" title="Cambiar imagen">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="image-info" *ngIf="archivoSeleccionado">
+              <span class="image-name">📎 {{ getNombreArchivo() }}</span>
+              <span class="image-size">{{ getTamanioArchivo() }}</span>
+            </div>
+          </div>
+
+          <!-- Loading state -->
+          <div class="loading-image" *ngIf="cargandoImagen">
+            <div class="spinner"></div>
+            <span>Procesando imagen...</span>
+          </div>
+
+          <!-- Error de imagen -->
+          <div *ngIf="errorImagen" class="error-message-inline">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>{{ errorImagen }}</span>
+          </div>
         </div>
 
         <!-- ⭐ SECCIÓN DE DESCRIPCIÓN IA -->

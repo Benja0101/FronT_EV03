@@ -14,6 +14,12 @@ export class ClientesListaComponent implements OnInit {
   loading = false;
   error = '';
 
+  // Paginación
+  paginaActual: number = 1;
+  totalPaginas: number = 1;
+  totalClientes: number = 0;
+  clientesPorPagina: number = 12;
+
   constructor(
     private clienteService: ClienteService,
     private router: Router,
@@ -31,12 +37,15 @@ export class ClientesListaComponent implements OnInit {
     this.error = '';
     this.clientes = []; // Limpiar clientes anteriores
 
-    this.clienteService.getAllClientes().subscribe({
+    this.clienteService.getClientes(this.paginaActual).subscribe({
       next: (response) => {
         console.log('✅ Clientes recibidos:', response);
         this.clientes = response.results || [];
+        this.totalClientes = response.count || 0;
+        this.totalPaginas = Math.ceil(this.totalClientes / this.clientesPorPagina);
         console.log('📦 Clientes procesados:', this.clientes.length);
-        console.log('📦 Clientes array:', this.clientes);
+        console.log('📦 Total clientes:', this.totalClientes);
+        console.log('📦 Total páginas:', this.totalPaginas);
         this.loading = false;
         console.log('✅ Loading = false');
         // Forzar detección de cambios
@@ -54,5 +63,65 @@ export class ClientesListaComponent implements OnInit {
 
   irACrear() {
     this.router.navigate(['/admin/clientes/crear']);
+  }
+
+  // Métodos de paginación
+  irAPagina(pagina: number) {
+    if (pagina < 1 || pagina > this.totalPaginas || pagina === this.paginaActual) {
+      return;
+    }
+    this.paginaActual = pagina;
+    this.cargarClientes();
+    this.scrollToTop();
+  }
+
+  paginaSiguiente() {
+    if (this.paginaActual < this.totalPaginas) {
+      this.irAPagina(this.paginaActual + 1);
+    }
+  }
+
+  paginaAnterior() {
+    if (this.paginaActual > 1) {
+      this.irAPagina(this.paginaActual - 1);
+    }
+  }
+
+  obtenerPaginas(): (number | string)[] {
+    const paginas: (number | string)[] = [];
+    const maxPaginas = 5;
+
+    if (this.totalPaginas <= maxPaginas + 2) {
+      for (let i = 1; i <= this.totalPaginas; i++) {
+        paginas.push(i);
+      }
+    } else {
+      paginas.push(1);
+
+      if (this.paginaActual > 3) {
+        paginas.push('...');
+      }
+
+      const inicio = Math.max(2, this.paginaActual - 1);
+      const fin = Math.min(this.totalPaginas - 1, this.paginaActual + 1);
+
+      for (let i = inicio; i <= fin; i++) {
+        paginas.push(i);
+      }
+
+      if (this.paginaActual < this.totalPaginas - 2) {
+        paginas.push('...');
+      }
+
+      if (this.totalPaginas > 1) {
+        paginas.push(this.totalPaginas);
+      }
+    }
+
+    return paginas;
+  }
+
+  scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }

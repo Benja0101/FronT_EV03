@@ -139,5 +139,45 @@
         <span>Crear Primer Cliente</span>
       </button>
     </div>
+
+    <!-- Paginación -->
+    <div *ngIf="!loading && clientes.length > 0 && totalPaginas > 1" class="paginacion">
+      <button 
+        class="btn-paginacion" 
+        [disabled]="paginaActual === 1"
+        (click)="paginaAnterior()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+        <span>Anterior</span>
+      </button>
+
+      <div class="numeros-pagina">
+        <button 
+          *ngFor="let pagina of obtenerPaginas()"
+          class="numero-pagina"
+          [class.activa]="pagina === paginaActual"
+          [disabled]="pagina === '...'"
+          (click)="pagina !== '...' && irAPagina(+pagina)">
+          {{ pagina }}
+        </button>
+      </div>
+
+      <button 
+        class="btn-paginacion" 
+        [disabled]="paginaActual === totalPaginas"
+        (click)="paginaSiguiente()">
+        <span>Siguiente</span>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+
+      <div class="info-paginacion">
+        <span>Página {{ paginaActual }} de {{ totalPaginas }}</span>
+        <span>•</span>
+        <span>Total: {{ totalClientes }} clientes</span>
+      </div>
+    </div>
   </div>
 </div>

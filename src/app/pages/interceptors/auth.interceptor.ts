@@ -15,30 +15,51 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   
   // Permitir requests públicas (sin token para clientes)
   const publicEndpoints = [
-    { method: 'GET', path: '/productos/' },
-    { method: 'POST', path: '/venta/' },
-    { method: 'POST', path: '/clientes/' },
-    { method: 'PUT', path: '/clientes/' },
-    { method: 'GET', path: '/clientes/' }
+    '/productos/',
+    '/venta/',
+    '/detalleVenta/'
   ];
   
-  for (const endpoint of publicEndpoints) {
-    if (req.method === endpoint.method && req.url.includes(endpoint.path)) {
-      const token = localStorage.getItem('access_token');
-      
-      // Si hay token, agregarlo (para administradores)
-      if (token) {
-        const clonedRequest = req.clone({
-          setHeaders: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-        return next(clonedRequest);
-      }
-      
-      // Si no hay token, dejar pasar sin autenticación (para clientes públicos)
-      return next(req);
+  // Permitir solo POST a /clientes/ sin token (crear cliente)
+  if (req.method === 'POST' && req.url.includes('/clientes/')) {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      const clonedRequest = req.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return next(clonedRequest);
     }
+    return next(req);
+  }
+  
+  // Permitir GET a productos sin token
+  if (req.method === 'GET' && req.url.includes('/productos/')) {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      const clonedRequest = req.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return next(clonedRequest);
+    }
+    return next(req);
+  }
+  
+  // Permitir POST a ventas y detalles sin token
+  if (req.method === 'POST' && (req.url.includes('/venta/') || req.url.includes('/detalleVenta/'))) {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      const clonedRequest = req.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return next(clonedRequest);
+    }
+    return next(req);
   }
   
   const token = localStorage.getItem('access_token');

@@ -348,6 +348,23 @@
   color: #667eea;
 }
 
+.client-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.client-email {
+  font-size: 0.95rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.client-rut {
+  font-size: 0.85rem;
+  color: #666;
+}
+
 /* Botones de acción */
 .action-buttons {
   display: grid;

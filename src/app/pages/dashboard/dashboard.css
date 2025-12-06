@@ -552,3 +552,195 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .dashboard-container {
+    padding: 1.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .content-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+
+  .header-content h1 {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .stat-card {
+    padding: 1.5rem;
+  }
+
+  .stat-icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .stat-icon svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .stat-info h3 {
+    font-size: 2rem;
+  }
+
+  .stat-info p {
+    font-size: 0.9rem;
+  }
+
+  .quick-actions {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .action-card {
+    padding: 1.25rem;
+  }
+
+  .action-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .action-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .action-card h3 {
+    font-size: 1rem;
+  }
+
+  .action-card p {
+    font-size: 0.85rem;
+  }
+
+  .ia-card {
+    padding: 1.25rem;
+  }
+
+  .ia-header h3 {
+    font-size: 1.1rem;
+  }
+
+  .ia-stats {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .ia-stat {
+    padding: 15px;
+  }
+
+  .ia-stat-value {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-container {
+    padding: 0.75rem;
+  }
+
+  .dashboard-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .header-content h1 {
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .stat-card {
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  .stat-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .stat-icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .stat-info h3 {
+    font-size: 1.75rem;
+  }
+
+  .stat-info p {
+    font-size: 0.85rem;
+  }
+
+  .action-card {
+    padding: 1rem;
+  }
+
+  .action-icon {
+    width: 45px;
+    height: 45px;
+  }
+
+  .action-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .action-card h3 {
+    font-size: 0.95rem;
+  }
+
+  .action-card p {
+    font-size: 0.8rem;
+  }
+
+  .ia-card {
+    padding: 1rem;
+  }
+
+  .ia-header h3 {
+    font-size: 1rem;
+  }
+
+  .ia-stat {
+    padding: 12px;
+  }
+
+  .ia-stat-icon {
+    font-size: 28px;
+  }
+
+  .ia-stat-value {
+    font-size: 22px;
+  }
+
+  .ia-stat-label {
+    font-size: 12px;
+  }
+}
+

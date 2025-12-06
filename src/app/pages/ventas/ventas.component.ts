@@ -31,6 +31,12 @@ export class VentasComponent implements OnInit {
   // Filtrado y búsqueda
   terminoBusqueda = '';
 
+  // Paginación
+  paginaActual: number = 1;
+  totalPaginas: number = 1;
+  totalVentas: number = 0;
+  ventasPorPagina: number = 12;
+
   // Modal de detalle
   mostrarModal = false;
   ventaSeleccionada: Venta | null = null;
@@ -77,10 +83,13 @@ export class VentasComponent implements OnInit {
     this.error = '';
     this.ventas = []; // Limpiar ventas anteriores
     
-    this.ventaService.getAllVentas().subscribe({
+    this.ventaService.getVentas(this.paginaActual).subscribe({
       next: (response) => {
         console.log('✅ Ventas recibidas:', response);
         this.ventas = response.results || [];
+        this.totalVentas = response.count || 0;
+        this.totalPaginas = Math.ceil(this.totalVentas / this.ventasPorPagina);
+        
         // Ordenar por fecha descendente (más recientes primero)
         this.ventas.sort((a, b) => {
           const fechaA = new Date(a.fecha).getTime();
@@ -89,6 +98,8 @@ export class VentasComponent implements OnInit {
         });
         this.ventasFiltradas = [...this.ventas];
         console.log('📦 Ventas procesadas:', this.ventas.length);
+        console.log('📦 Total ventas:', this.totalVentas);
+        console.log('📦 Total páginas:', this.totalPaginas);
         console.log('📦 Ventas filtradas:', this.ventasFiltradas.length);
         this.loading = false;
         console.log('✅ Loading = false');
@@ -234,5 +245,65 @@ export class VentasComponent implements OnInit {
     // Si es un string (código), buscar en la lista de productos
     const prod = this.productos.find(p => p.codigo === producto);
     return prod ? prod.nombre : producto;
+  }
+
+  // Métodos de paginación
+  irAPagina(pagina: number) {
+    if (pagina < 1 || pagina > this.totalPaginas || pagina === this.paginaActual) {
+      return;
+    }
+    this.paginaActual = pagina;
+    this.cargarVentas();
+    this.scrollToTop();
+  }
+
+  paginaSiguiente() {
+    if (this.paginaActual < this.totalPaginas) {
+      this.irAPagina(this.paginaActual + 1);
+    }
+  }
+
+  paginaAnterior() {
+    if (this.paginaActual > 1) {
+      this.irAPagina(this.paginaActual - 1);
+    }
+  }
+
+  obtenerPaginas(): (number | string)[] {
+    const paginas: (number | string)[] = [];
+    const maxPaginas = 5;
+
+    if (this.totalPaginas <= maxPaginas + 2) {
+      for (let i = 1; i <= this.totalPaginas; i++) {
+        paginas.push(i);
+      }
+    } else {
+      paginas.push(1);
+
+      if (this.paginaActual > 3) {
+        paginas.push('...');
+      }
+
+      const inicio = Math.max(2, this.paginaActual - 1);
+      const fin = Math.min(this.totalPaginas - 1, this.paginaActual + 1);
+
+      for (let i = inicio; i <= fin; i++) {
+        paginas.push(i);
+      }
+
+      if (this.paginaActual < this.totalPaginas - 2) {
+        paginas.push('...');
+      }
+
+      if (this.totalPaginas > 1) {
+        paginas.push(this.totalPaginas);
+      }
+    }
+
+    return paginas;
+  }
+
+  scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }

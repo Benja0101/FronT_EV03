@@ -75,71 +75,21 @@ export class CheckoutComponent implements OnInit {
   buscarClientePorRut(): void {
     if (!this.clienteData.rut || this.clienteData.rut.trim() === '') return;
     
-    this.clienteService.getCliente(this.clienteData.rut).subscribe({
-      next: (cliente) => {
-        this.clienteEncontrado = cliente;
-        this.esClienteRegistrado = cliente.nombre !== 'Cliente' || cliente.apellido !== 'Web';
-        
-        // Autocompletar datos
-        if (cliente.email && cliente.email.trim() !== '') {
-          this.clienteData.correo = cliente.email;
-        }
-        
-        // Si es un cliente registrado, cargar todos los datos
-        if (this.esClienteRegistrado) {
-          this.registroData.nombre = cliente.nombre;
-          this.registroData.apellido = cliente.apellido;
-          this.registroData.comuna = cliente.comuna;
-          this.mostrarExito('¡Bienvenido de vuelta! Tus datos han sido cargados.');
-        } else {
-          // Es un cliente temporal (ya compró pero no se registró)
-          this.yaCompro = true;
-        }
-      },
-      error: (err) => {
-        this.clienteEncontrado = null;
-        this.esClienteRegistrado = false;
-        this.yaCompro = false;
-      }
-    });
+    // Solo buscar si el usuario está autenticado o es una búsqueda pública
+    // Para checkout público, simplemente continuar sin buscar cliente previo
+    this.clienteEncontrado = null;
+    this.esClienteRegistrado = false;
+    this.yaCompro = false;
   }
 
   buscarClientePorEmail(): void {
     if (!this.clienteData.correo || this.clienteData.correo.trim() === '') return;
     if (!this.validarEmail(this.clienteData.correo)) return;
     
-    // Django no tiene endpoint directo por email, buscar en la lista
-    this.clienteService.getAllClientes().subscribe({
-      next: (response) => {
-        const cliente = response.results.find(c => c.email === this.clienteData.correo);
-        
-        if (cliente) {
-          this.clienteEncontrado = cliente;
-          this.esClienteRegistrado = cliente.nombre !== 'Cliente' || cliente.apellido !== 'Web';
-          
-          // Autocompletar RUT
-          this.clienteData.rut = cliente.rut;
-          
-          // Si es un cliente registrado, cargar todos los datos
-          if (this.esClienteRegistrado) {
-            this.registroData.nombre = cliente.nombre;
-            this.registroData.apellido = cliente.apellido;
-            this.registroData.comuna = cliente.comuna;
-            this.mostrarExito('¡Bienvenido de vuelta! Tus datos han sido cargados.');
-          } else {
-            // Es un cliente temporal (ya compró pero no se registró)
-            this.yaCompro = true;
-          }
-        } else {
-          this.clienteEncontrado = null;
-          this.esClienteRegistrado = false;
-          this.yaCompro = false;
-        }
-      },
-      error: (err) => {
-        // Error al buscar cliente
-      }
-    });
+    // Para checkout público, simplemente validar formato sin buscar en base de datos
+    this.clienteEncontrado = null;
+    this.esClienteRegistrado = false;
+    this.yaCompro = false;
   }
 
   abrirModalRegistro() {
@@ -187,19 +137,7 @@ export class CheckoutComponent implements OnInit {
       return;
     }
 
-    // Si es cliente registrado, procesar directamente
-    if (this.esClienteRegistrado) {
-      this.procesarCompra();
-      return;
-    }
-
-    // Si ya compró antes pero no está registrado, preguntar
-    if (this.yaCompro) {
-      this.abrirModalRegistro();
-      return;
-    }
-
-    // Cliente nuevo, proceder directamente sin registro
+    // Para compras públicas, siempre procesar como cliente nuevo sin registro
     this.quiereRegistrarse = false;
     this.procesarCompra();
   }
@@ -212,78 +150,33 @@ export class CheckoutComponent implements OnInit {
   private procesarCompra() {
     this.procesando = true;
 
-    // Siempre verificar/crear el cliente antes de la venta
-    if (this.quiereRegistrarse) {
-      // Si quiere registrarse, crear/actualizar con datos completos
-      const clienteCompleto = {
-        rut: this.clienteData.rut,
-        nombre: this.registroData.nombre,
-        apellido: this.registroData.apellido,
-        email: this.clienteData.correo,
-        comuna: this.registroData.comuna
-      };
+    // Crear cliente básico/temporal para la compra
+    const clienteTemporal = {
+      rut: this.clienteData.rut,
+      nombre: 'Cliente',
+      apellido: 'Web',
+      email: this.clienteData.correo,
+      comuna: 'No especificada'
+    };
 
-      // Si el cliente ya existe (yaCompro = true), actualizar en lugar de crear
-      if (this.yaCompro || this.clienteEncontrado) {
-        this.clienteService.updateCliente(this.clienteData.rut, clienteCompleto).subscribe({
-          next: (clienteActualizado) => {
-            this.crearVenta();
-          },
-          error: (err) => {
-            this.procesando = false;
-            this.mostrarError('Error al actualizar el cliente. Por favor, intenta nuevamente.');
-          }
-        });
-      } else {
-        // Cliente nuevo, crear
-        this.clienteService.createCliente(clienteCompleto).subscribe({
-          next: (clienteCreado) => {
-            this.crearVenta();
-          },
-          error: (err) => {
-            // Si ya existe, intentar actualizar
-            if (err.status === 400 || err.status === 409) {
-              this.clienteService.updateCliente(this.clienteData.rut, clienteCompleto).subscribe({
-                next: () => {
-                  this.crearVenta();
-                },
-                error: (updateErr) => {
-                  this.procesando = false;
-                  this.mostrarError('Error al procesar el cliente. Por favor, intenta nuevamente.');
-                }
-              });
-            } else {
-              this.procesando = false;
-              this.mostrarError('Error al registrar el cliente. Por favor, intenta nuevamente.');
-            }
-          }
-        });
-      }
-    } else {
-      // Si no quiere registrarse, crear cliente básico/temporal
-      const clienteTemporal = {
-        rut: this.clienteData.rut,
-        nombre: 'Cliente',
-        apellido: 'Web',
-        email: this.clienteData.correo,
-        comuna: 'No especificada'
-      };
-
-      this.clienteService.createCliente(clienteTemporal).subscribe({
-        next: (clienteCreado) => {
+    this.clienteService.createCliente(clienteTemporal).subscribe({
+      next: (clienteCreado) => {
+        console.log('✅ Cliente creado:', clienteCreado);
+        this.crearVenta();
+      },
+      error: (err) => {
+        console.log('⚠️ Error al crear cliente (puede que ya exista):', err);
+        // Si el cliente ya existe (error 400 o 409), continuar con la venta de todos modos
+        if (err.status === 400 || err.status === 409) {
+          console.log('✅ Cliente ya existe, continuando con la venta');
           this.crearVenta();
-        },
-        error: (err) => {
-          // Si ya existe, continuar con la venta
-          if (err.status === 400 || err.status === 409) {
-            this.crearVenta();
-          } else {
-            this.procesando = false;
-            this.mostrarError('Error al procesar el cliente. Por favor, intenta nuevamente.');
-          }
+        } else {
+          this.procesando = false;
+          this.mostrarError('Error al procesar el cliente. Por favor, intenta nuevamente.');
+          console.error('❌ Error al crear cliente:', err);
         }
-      });
-    }
+      }
+    });
   }
 
   private crearVenta() {
@@ -308,15 +201,48 @@ export class CheckoutComponent implements OnInit {
 
     this.ventaService.createVenta(venta as any).subscribe({
       next: (response: any) => {
-        // Guardar datos de la venta en localStorage para la página de pago
-        localStorage.setItem('ventaPendiente', JSON.stringify({
-          numero: response.numero,
-          total: response.total,
-          productos: this.items,
-          cliente: this.clienteData
-        }));
-        // Redirigir al pago
-        this.router.navigate(['/cliente/pago']);
+        try {
+          // Limpiar localStorage antes de guardar datos nuevos
+          const keysToRemove = ['ventaPendiente'];
+          keysToRemove.forEach(key => {
+            try {
+              localStorage.removeItem(key);
+            } catch (e) {
+              console.warn('Error al limpiar localStorage:', e);
+            }
+          });
+
+          // Guardar solo datos esenciales (sin imágenes de productos)
+          const ventaMinima = {
+            numero: response.numero,
+            total: response.total,
+            productos: this.items.map(item => ({
+              nombre: item.producto.nombre,
+              codigo: item.producto.codigo,
+              cantidad: item.cantidad,
+              precio: item.producto.precio,
+              subtotal: item.producto.precio * item.cantidad
+            })),
+            cliente: {
+              rut: this.clienteData.rut,
+              correo: this.clienteData.correo
+            }
+          };
+
+          localStorage.setItem('ventaPendiente', JSON.stringify(ventaMinima));
+          
+          // Redirigir al pago
+          this.router.navigate(['/cliente/pago']);
+        } catch (storageError) {
+          console.error('Error en localStorage:', storageError);
+          // Aún así redirigir al pago con datos en la sesión
+          this.router.navigate(['/cliente/pago'], {
+            state: {
+              numero: response.numero,
+              total: response.total
+            }
+          });
+        }
       },
       error: (err: any) => {
         this.procesando = false;

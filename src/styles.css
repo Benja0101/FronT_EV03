@@ -47,3 +47,58 @@ html, body {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.05);
 }
+
+/* Mejoras de accesibilidad táctil para móviles */
+@media (max-width: 768px) {
+  /* Aumentar tamaño de elementos interactivos en móvil */
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    min-height: 44px; /* Tamaño mínimo recomendado para táctil */
+  }
+
+  /* Prevenir zoom al enfocar inputs en iOS */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Mejorar espaciado para navegación táctil */
+  body {
+    -webkit-tap-highlight-color: rgba(102, 126, 234, 0.2);
+    touch-action: manipulation;
+  }
+
+  /* Optimizar renderizado en móviles */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Prevenir overflow horizontal en móviles */
+html,
+body {
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Smooth scroll para toda la aplicación */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Optimizaciones de performance para animaciones */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+

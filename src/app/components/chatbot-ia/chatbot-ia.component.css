@@ -216,11 +216,80 @@
 }
 
 /* === RESPONSIVE MÓVIL === */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
+  .chatbot-container {
+    bottom: 16px;
+    right: 16px;
+  }
+
   .chat-window {
-    width: calc(100vw - 40px);
-    height: calc(100vh - 140px);
-    left: 20px;
-    right: 20px;
+    width: calc(100vw - 32px);
+    height: 550px;
+    bottom: 70px;
+    right: 0;
+  }
+
+  .chat-toggle-btn {
+    width: 52px;
+    height: 52px;
+    font-size: 24px;
   }
 }
+
+@media (max-width: 480px) {
+  .chatbot-container {
+    bottom: 12px;
+    right: 12px;
+  }
+
+  .chat-window {
+    width: calc(100vw - 24px);
+    height: calc(100vh - 120px);
+    max-height: 600px;
+    left: 12px;
+    right: 12px;
+    bottom: 65px;
+  }
+
+  .chat-header {
+    padding: 14px 16px;
+  }
+
+  .header-text h3 {
+    font-size: 15px;
+  }
+
+  .status {
+    font-size: 12px;
+  }
+
+  .chat-messages {
+    padding: 14px;
+  }
+
+  .message {
+    max-width: 90%;
+    font-size: 14px;
+  }
+
+  .chat-input-container {
+    padding: 12px 14px;
+  }
+
+  .chat-input {
+    font-size: 14px;
+    padding: 10px 14px;
+  }
+
+  .send-btn {
+    width: 44px;
+    font-size: 18px;
+  }
+
+  .chat-toggle-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 22px;
+  }
+}
+

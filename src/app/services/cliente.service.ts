@@ -7,8 +7,29 @@ export interface Cliente {
   rut: string;
   nombre: string;
   apellido: string;
-  email?: string;
+  email: string;
   comuna: string;
+  direccion?: string;
+  telefono?: string;
+  password?: string;
+  is_active?: boolean;
+  fecha_registro?: string;
+}
+
+export interface ClienteLoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface ClienteRegisterRequest {
+  rut: string;
+  nombre: string;
+  apellido: string;
+  email: string;
+  password: string;
+  comuna: string;
+  direccion?: string;
+  telefono?: string;
 }
 
 export interface PaginatedResponse<T> {
@@ -54,5 +75,33 @@ export class ClienteService {
 
   deleteCliente(rut: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}${rut}/`);
+  }
+
+  // Métodos de autenticación de clientes
+  loginCliente(credentials: ClienteLoginRequest): Observable<{ token: string; cliente: Cliente }> {
+    return this.http.post<{ token: string; cliente: Cliente }>(`${this.apiUrl}login/`, credentials);
+  }
+
+  registerCliente(data: ClienteRegisterRequest): Observable<{ cliente: Cliente; token: string }> {
+    return this.http.post<{ cliente: Cliente; token: string }>(`${this.apiUrl}register/`, data);
+  }
+
+  getClienteByEmail(email: string): Observable<Cliente> {
+    return this.http.get<Cliente>(`${this.apiUrl}by-email/${email}/`);
+  }
+
+  getPerfilActual(): Observable<Cliente> {
+    return this.http.get<Cliente>(`${this.apiUrl}perfil/`);
+  }
+
+  updatePerfil(data: Partial<Cliente>): Observable<Cliente> {
+    return this.http.patch<Cliente>(`${this.apiUrl}perfil/`, data);
+  }
+
+  cambiarPassword(currentPassword: string, newPassword: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}cambiar-password/`, {
+      current_password: currentPassword,
+      new_password: newPassword
+    });
   }
 }

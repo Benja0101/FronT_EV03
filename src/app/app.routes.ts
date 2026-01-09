@@ -12,27 +12,35 @@ import { Pago } from './pages/pago/pago';
 import { ConfirmacionCompra } from './pages/confirmacion-compra/confirmacion-compra';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { PerfilCliente } from './pages/perfil-cliente/perfil-cliente';
-import { authGuard } from './guards/auth.guard';
+import { LoginClienteComponent } from './pages/login-cliente/login-cliente.component';
+import { RegistroClienteComponent } from './pages/registro-cliente/registro-cliente.component';
+import { adminGuard, clienteGuard, guestGuard } from './guards/guards';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/cliente/home', pathMatch: 'full' },
-  { path: 'login', component: Login },
   
-  // Rutas de administrador
-  { path: 'admin/dashboard', component: Dashboard, canActivate: [authGuard] },
-  { path: 'admin/clientes', component: ClientesListaComponent, canActivate: [authGuard] },
-  { path: 'admin/clientes/crear', component: ClienteCrearComponent, canActivate: [authGuard] },
-  { path: 'admin/productos', component: ProductosListaComponent, canActivate: [authGuard] },
-  { path: 'admin/productos/crear', component: ProductoCrearComponent, canActivate: [authGuard] },
-  { path: 'admin/ventas', component: VentasComponent, canActivate: [authGuard] },
+  // Rutas de autenticación
+  { path: 'login', component: Login, canActivate: [guestGuard] },
+  { path: 'login-cliente', component: LoginClienteComponent, canActivate: [guestGuard] },
+  { path: 'registro-cliente', component: RegistroClienteComponent, canActivate: [guestGuard] },
   
-  // Rutas de cliente (sin autenticación)
+  // Rutas de administrador (requieren autenticación de admin)
+  { path: 'admin/dashboard', component: Dashboard, canActivate: [adminGuard] },
+  { path: 'admin/clientes', component: ClientesListaComponent, canActivate: [adminGuard] },
+  { path: 'admin/clientes/crear', component: ClienteCrearComponent, canActivate: [adminGuard] },
+  { path: 'admin/productos', component: ProductosListaComponent, canActivate: [adminGuard] },
+  { path: 'admin/productos/crear', component: ProductoCrearComponent, canActivate: [adminGuard] },
+  { path: 'admin/ventas', component: VentasComponent, canActivate: [adminGuard] },
+  
+  // Rutas de cliente públicas (sin autenticación requerida)
   { path: 'cliente/home', component: HomeClienteComponent },
   { path: 'cliente/carrito', component: CarritoComponent },
   { path: 'cliente/checkout', component: CheckoutComponent },
   { path: 'cliente/pago', component: Pago },
   { path: 'cliente/confirmacion', component: ConfirmacionCompra },
-  { path: 'cliente/perfil', component: PerfilCliente },
+  
+  // Rutas de cliente protegidas (requieren autenticación de cliente)
+  { path: 'cliente/perfil', component: PerfilCliente, canActivate: [clienteGuard] },
   
   // Mantener rutas antiguas para compatibilidad
   { path: 'clientes', redirectTo: '/admin/clientes' },
@@ -41,4 +49,5 @@ export const routes: Routes = [
   
   { path: '**', redirectTo: '/cliente/home' }
 ];
+
 

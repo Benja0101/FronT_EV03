@@ -8,79 +8,82 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const router = inject(Router);
   
-  // Permitir requests a endpoints de token sin autenticación
-  if (req.url.includes('/token/')) {
+  // Permitir requests a endpoints de autenticación sin token
+  if (req.url.includes('/token/') || req.url.includes('/login/') || req.url.includes('/register/')) {
     return next(req);
   }
   
-  // Permitir requests públicas (sin token para clientes)
+  // Determinar qué tipo de token usar
+  const adminToken = localStorage.getItem('access_token');
+  const clienteToken = localStorage.getItem('cliente_token');
+  
+  // Endpoints que requieren token de cliente
+  const clienteEndpoints = [
+    '/clientes/perfil',
+    '/clientes/cambiar-password'
+  ];
+  
+  // Endpoints públicos que no requieren token
   const publicEndpoints = [
     '/productos/',
     '/venta/',
     '/detalleVenta/'
   ];
   
-  // Permitir solo POST a /clientes/ sin token (crear cliente)
-  if (req.method === 'POST' && req.url.includes('/clientes/')) {
-    const token = localStorage.getItem('access_token');
-    if (token) {
+  // Permitir POST/GET a productos sin token (pero agregarlo si existe)
+  if (req.url.includes('/productos/')) {
+    if (adminToken) {
       const clonedRequest = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`
-        }
+        setHeaders: { Authorization: `Bearer ${adminToken}` }
       });
       return next(clonedRequest);
     }
     return next(req);
   }
   
-  // Permitir GET a productos sin token
-  if (req.method === 'GET' && req.url.includes('/productos/')) {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      const clonedRequest = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      return next(clonedRequest);
-    }
+  // Permitir POST a clientes/register sin token
+  if (req.method === 'POST' && req.url.includes('/clientes/register')) {
     return next(req);
   }
   
-  // Permitir POST a ventas y detalles sin token
+  // Permitir POST a ventas sin token (pero agregarlo si existe)
   if (req.method === 'POST' && (req.url.includes('/venta/') || req.url.includes('/detalleVenta/'))) {
-    const token = localStorage.getItem('access_token');
-    if (token) {
+    if (adminToken) {
       const clonedRequest = req.clone({
-        setHeaders: {
-          Authorization: `Bearer ${token}`
-        }
+        setHeaders: { Authorization: `Bearer ${adminToken}` }
       });
       return next(clonedRequest);
     }
     return next(req);
   }
   
-  const token = localStorage.getItem('access_token');
-  
-  // Si no hay token, dejar pasar la request sin Authorization header
-  // El servidor responderá con 401/403 y el guard se encargará de la redirección
-  if (!token) {
-    return next(req).pipe(
-      catchError((error: HttpErrorResponse) => {
-        return throwError(() => error);
-      })
-    );
+  // Usar token de cliente para endpoints específicos de cliente
+  const isClienteEndpoint = clienteEndpoints.some(endpoint => req.url.includes(endpoint));
+  if (isClienteEndpoint && clienteToken) {
+    const clonedRequest = req.clone({
+      setHeaders: { Authorization: `Token ${clienteToken}` }
+    });
+    return handleRequest(clonedRequest, next, authService, router, false);
   }
   
-  const clonedRequest = req.clone({
-    setHeaders: {
-      Authorization: `Bearer ${token}`
-    }
-  });
+  // Usar token de admin para todo lo demás
+  if (adminToken) {
+    const clonedRequest = req.clone({
+      setHeaders: { Authorization: `Bearer ${adminToken}` }
+    });
+    return handleRequest(clonedRequest, next, authService, router, true);
+  }
   
-  return next(clonedRequest).pipe(
+  // Si no hay token, dejar pasar sin Authorization
+  return next(req).pipe(
+    catchError((error: HttpErrorResponse) => {
+      return throwError(() => error);
+    })
+  );
+};
+
+function handleRequest(req: any, next: any, authService: AuthService, router: Router, isAdmin: boolean) {
+  return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       console.error('❌ Error HTTP:', {
         url: error.url,
@@ -89,24 +92,20 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         error: error.error
       });
       
-      // Si es error 401, intentar refrescar el token
-      if (error.status === 401 && !req.url.includes('/token/refresh/')) {
+      // Si es error 401 y es admin, intentar refrescar el token
+      if (error.status === 401 && isAdmin && !req.url.includes('/token/refresh/')) {
         console.log('🔄 Token expirado, intentando refrescar...');
         
         return authService.refreshToken().pipe(
           switchMap((response) => {
             console.log('✅ Token refrescado exitosamente');
-            // Reintentar la petición original con el nuevo token
             const newReq = req.clone({
-              setHeaders: {
-                Authorization: `Bearer ${response.access}`
-              }
+              setHeaders: { Authorization: `Bearer ${response.access}` }
             });
             return next(newReq);
           }),
           catchError((refreshError) => {
             console.error('❌ Error al refrescar token:', refreshError);
-            // Si falla el refresh, cerrar sesión y redirigir al login
             authService.logout();
             router.navigate(['/login']);
             return throwError(() => refreshError);
@@ -114,12 +113,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         );
       }
       
-      // Si es error 403, solo reportar (no hacer logout automáticamente)
-      if (error.status === 403) {
-        console.error('❌ Error 403 Forbidden - El token no es válido o ha expirado');
+      // Si es error 401 y es cliente, redirigir al login de cliente
+      if (error.status === 401 && !isAdmin) {
+        console.log('⚠️ Cliente no autenticado');
+        authService.logout();
+        router.navigate(['/login-cliente']);
       }
       
       return throwError(() => error);
     })
   );
-};
+}

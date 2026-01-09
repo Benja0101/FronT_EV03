@@ -185,6 +185,114 @@
   height: 18px;
 }
 
+.login-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(72, 187, 120, 0.3);
+}
+
+.login-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(72, 187, 120, 0.5);
+  background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+}
+
+.login-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.register-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(66, 153, 225, 0.3);
+}
+
+.register-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(66, 153, 225, 0.5);
+  background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+}
+
+.register-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.perfil-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+}
+
+.perfil-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.perfil-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.logout-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(245, 101, 101, 0.3);
+}
+
+.logout-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(245, 101, 101, 0.5);
+  background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+}
+
+.logout-button svg {
+  width: 18px;
+  height: 18px;
+}
+
 .cart-button {
   display: flex;
   align-items: center;
@@ -1492,6 +1600,10 @@ h2 {
   }
 
   .admin-button,
+  .login-button,
+  .register-button,
+  .perfil-button,
+  .logout-button,
   .cart-button {
     padding: 0.6rem 1rem;
     font-size: 0.85rem;
@@ -1673,9 +1785,21 @@ h2 {
   }
 
   .admin-button,
+  .login-button,
+  .register-button,
+  .perfil-button,
+  .logout-button,
   .cart-button {
     padding: 0.5rem 0.85rem;
     font-size: 0.8rem;
+  }
+
+  .admin-button span,
+  .login-button span,
+  .register-button span,
+  .perfil-button span,
+  .logout-button span {
+    display: none;
   }
 
   .hero-title {

@@ -102,6 +102,37 @@ export class HomeClienteComponent implements OnInit {
     }
   }
 
+  irAlLoginCliente() {
+    this.router.navigate(['/login-cliente']);
+  }
+
+  irAlRegistroCliente() {
+    this.router.navigate(['/registro-cliente']);
+  }
+
+  irAlPerfil() {
+    this.router.navigate(['/cliente/perfil']);
+  }
+
+  isClienteLogueado(): boolean {
+    return this.authService.isCliente();
+  }
+
+  getNombreCliente(): string {
+    const clienteData = this.authService.getClienteData();
+    if (clienteData) {
+      return clienteData.nombre || 'Mi Perfil';
+    }
+    return 'Mi Perfil';
+  }
+
+  cerrarSesion() {
+    this.authService.logout();
+    this.mostrarMensaje('Sesión cerrada exitosamente', 'success');
+    // Recargar datos si es necesario
+    this.ngOnInit();
+  }
+
   scrollToProductos() {
     const element = document.getElementById('productos');
     if (element) {
